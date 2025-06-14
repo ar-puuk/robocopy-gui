@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robocopy Pro GUI</title>
+    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <style>
+        :root {
+            --form-element-spacing-vertical: 0.75rem;
+            --form-element-spacing-horizontal: 1rem;
+        }
+        body {
+            padding: 1.5rem;
+        }
+        .header-grid {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        h1 {
+            text-align: left;
+            margin-bottom: 0;
+        }
+        legend, .bold-label {
+            font-weight: bold;
+        }
+        fieldset {
+            padding-bottom: 1rem;
+        }
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 0.5rem 1.5rem;
+        }
+        label {
+            margin-bottom: 0; /* Override pico default */
+        }
+        article {
+            padding: 1rem 1.5rem 1.5rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+        textarea {
+            font-family: monospace;
+            white-space: pre;
+            word-wrap: normal;
+            overflow-x: scroll;
+        }
+        .batch-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        /* Tweak for switch alignment */
+        [role="switch"] {
+            margin-bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <header class="header-grid">
+            <h1>Robocopy Pro</h1>
+            <label for="theme-switcher">
+              <input type="checkbox" id="theme-switcher" name="theme-switcher" role="switch">
+              Dark Mode
+            </label>
+        </header>
+
+        <article>
+             <fieldset>
+                <legend>Source & Destination</legend>
+                <div class="grid">
+                     <label for="source" class="bold-label">Source Path:
+                        <input type="text" id="source" name="source" placeholder="C:\source\folder">
+                    </label>
+                    <label for="destination" class="bold-label">Destination Path:
+                        <input type="text" id="destination" name="destination" placeholder="F:\destination\folder">
+                    </label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>Options</legend>
+                <div class="options-grid">
+                    <fieldset>
+                        <legend>Copy</legend>
+                        <label for="copySubdirectories"><input type="checkbox" id="copySubdirectories" name="S">/S (Subdirs)</label>
+                        <label for="copyEmptySubdirectories"><input type="checkbox" id="copyEmptySubdirectories" name="E">/E (Empty Subdirs)</label>
+                        <label for="mirror"><input type="checkbox" id="mirror" name="MIR">/MIR (Mirror)</label>
+                        <label for="copyall"><input type="checkbox" id="copyall" name="COPYALL">/COPYALL</label>
+                        <label for="restartable"><input type="checkbox" id="restartable" name="Z">/Z (Restartable)</label>
+                        <label for="backup"><input type="checkbox" id="backup" name="B">/B (Backup Mode)</label>
+                        <label for="moveFiles"><input type="checkbox" id="moveFiles" name="MOV">/MOV (Move Files)</label>
+                        <label for="moveFilesAndDirs"><input type="checkbox" id="moveFilesAndDirs" name="MOVE">/MOVE (Move Dirs)</label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>File Selection</legend>
+                        <label for="xo"><input type="checkbox" id="xo" name="XO">/XO (Exclude Older)</label>
+                        <label for="includeSame"><input type="checkbox" id="includeSame" name="IS">/IS (Include Same)</label>
+                        <label for="includeTweaked"><input type="checkbox" id="includeTweaked" name="IT">/IT (Include Tweaked)</label>
+                        <label for="excludeFiles">/XF (Excl. Files):
+                            <input type="text" id="excludeFiles" name="XF" placeholder="*.tmp *.bak">
+                        </label>
+                        <label for="excludeDirs">/XD (Excl. Dirs):
+                            <input type="text" id="excludeDirs" name="XD" placeholder="temp recycled">
+                        </label>
+                    </fieldset>
+                    
+                    <fieldset>
+                        <legend>Advanced</legend>
+                        <label for="copyFlags">/COPY:flags:
+                            <input type="text" id="copyFlags" name="COPY" placeholder="DAT">
+                        </label>
+                         <label for="dcopyFlags">/DCOPY:flags:
+                            <input type="text" id="dcopyFlags" name="DCOPY" placeholder="DAT">
+                        </label>
+                        <label for="multithread">/MT:n (Threads):
+                            <input type="number" id="multithread" name="MT" min="1" max="128" placeholder="8">
+                        </label>
+                         <label for="level">/LEV:n (Levels):
+                            <input type="number" id="level" name="LEV" min="1">
+                        </label>
+                    </fieldset>
+
+                    <fieldset>
+                        <legend>Retry & Logging</legend>
+                         <label for="retries">/R:n (Retries):
+                            <input type="number" id="retries" name="R" min="0" value="1">
+                        </label>
+                        <label for="waitTime">/W:n (Wait Time s):
+                            <input type="number" id="waitTime" name="W" min="0" value="5">
+                        </label>
+                        <label for="verbose"><input type="checkbox" id="verbose" name="V">/V (Verbose)</label>
+                        <label for="noProgress"><input type="checkbox" id="noProgress" name="NP">/NP (No Progress)</label>
+                        <label for="logFile">/LOG:file:
+                            <input type="text" id="logFile" name="LOG" placeholder="C:\logs\robocopy.log">
+                        </label>
+                        <label for="logAppendFile">/LOG+:file (append):
+                            <input type="text" id="logAppendFile" name="LOG+" placeholder="C:\logs\robocopy.log">
+                        </label>
+                    </fieldset>
+                </div>
+            </fieldset>
+        </article>
+
+        <article>
+            <h2 class="bold-label">Generated Command</h2>
+            <textarea id="generatedCommand" rows="3"></textarea>
+            <div class="batch-buttons">
+                <button id="addToBatch">Add to Batch Script</button>
+                <button id="downloadBatch" class="contrast">Download Batch File</button>
+            </div>
+        </article>
+
+        <article>
+            <h2 class="bold-label">Batch Script Content</h2>
+            <textarea id="batchContent" rows="8" readonly placeholder="Your generated commands will appear here..."></textarea>
+        </article>
+    </main>
+
+    <script>
+        const form = document.querySelector('main');
+        const generatedCommand = document.getElementById('generatedCommand');
+        const batchContent = document.getElementById('batchContent');
+        const addToBatchBtn = document.getElementById('addToBatch');
+        const downloadBatchBtn = document.getElementById('downloadBatch');
+        const themeSwitcher = document.getElementById('theme-switcher');
+        const htmlElement = document.documentElement;
+
+        let batchCommands = ["@echo off", ""];
+
+        // --- THEME SWITCHER LOGIC ---
+        function setTheme(theme) {
+            htmlElement.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            themeSwitcher.checked = theme === 'dark';
+        }
+
+        themeSwitcher.addEventListener('change', () => {
+            const theme = themeSwitcher.checked ? 'dark' : 'light';
+            setTheme(theme);
+        });
+
+        // Load saved theme from localStorage on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+            setTheme(savedTheme);
+            generateCommand(); // Generate command on load
+            updateBatchContent(); // Update batch view on load
+        });
+        
+        // --- ROBOCOPY LOGIC ---
+        function generateCommand() {
+            let command = 'robocopy ';
+
+            const source = document.getElementById('source').value.trim();
+            const destination = document.getElementById('destination').value.trim();
+
+            if (source && destination) {
+                command += `"${source}" "${destination}" `;
+            } else {
+                generatedCommand.value = 'Please enter source and destination paths.';
+                return;
+            }
+
+            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="text"], input[type="number"]');
+
+            inputs.forEach(input => {
+                if (input.type === 'checkbox' && input.checked) {
+                    if (!['source', 'destination', 'theme-switcher'].includes(input.id)) {
+                        command += `/${input.name.toUpperCase()} `;
+                    }
+                } else if ((input.type === 'text' || input.type === 'number') && input.value.trim() !== '' && !['source', 'destination'].includes(input.id)) {
+                    const val = input.value.trim();
+                    const name = input.name.toUpperCase();
+                    // For options that take colon-separated values
+                    if (['R', 'W', 'COPY', 'DCOPY', 'LEV', 'LOG', 'LOG+', 'XF', 'XD', 'MT'].includes(name)) {
+                         command += `/${name}:${val} `;
+                    }
+                }
+            });
+
+            generatedCommand.value = command.trim().replace(/\s+/g, ' ');
+        }
+
+        function updateBatchContent() {
+            batchContent.value = batchCommands.join('\n');
+        }
+
+        addToBatchBtn.addEventListener('click', () => {
+            const command = generatedCommand.value;
+            if (command && !command.startsWith('Please')) {
+                batchCommands.push(command);
+                updateBatchContent();
+            }
+        });
+
+        downloadBatchBtn.addEventListener('click', () => {
+            if (batchCommands.length > 2) { // more than just @echo off and a blank line
+                batchCommands.push("\n@echo.");
+                batchCommands.push("@echo Robocopy script finished.");
+                batchCommands.push("@pause");
+                const batchText = batchCommands.join('\r\n');
+                const blob = new Blob([batchText], { type: 'application/bat' });
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'robocopy_script.bat';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                // remove the pause command after download
+                batchCommands.pop();
+                batchCommands.pop();
+                batchCommands.pop();
+            } else {
+                alert('No commands in the batch. Please generate and add a command first.');
+            }
+        });
+        
+        form.addEventListener('input', generateCommand);
+
+    </script>
+</body>
+</html>
