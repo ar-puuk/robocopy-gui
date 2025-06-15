@@ -1,267 +1,481 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Robocopy Pro GUI</title>
-    <link rel="stylesheet" href="https://unpkg.com/@picocss/pico@latest/css/pico.min.css">
+    <title>Robocopy Command Generator</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         :root {
-            --form-element-spacing-vertical: 0.75rem;
-            --form-element-spacing-horizontal: 1rem;
+            --font-family: 'Segoe UI Variable', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --radius: 6px;
+
+            /* Light Theme */
+            --bg-primary-light: #f3f3f3;
+            --bg-secondary-light: #ffffff;
+            --bg-tertiary-light: #f9f9f9;
+            --text-primary-light: #1f1f1f;
+            --text-secondary-light: #605e5c;
+            --border-light: #e1dfdd;
+            --input-bg-light: #ffffff;
+            --accent-light: #0078d4;
+            --hover-light: #106ebe;
+            --shadow-light: 0 1px 2px rgba(0,0,0,0.1);
+
+            /* Dark Theme */
+            --bg-primary-dark: #202020;
+            --bg-secondary-dark: #2b2b2b;
+            --bg-tertiary-dark: #323232;
+            --text-primary-dark: #ffffff;
+            --text-secondary-dark: #a1a1a1;
+            --border-dark: #444444;
+            --input-bg-dark: #3c3c3c;
+            --accent-dark: #4cc2ff;
+            --hover-dark: #62caff;
+            --shadow-dark: 0 1px 2px rgba(0,0,0,0.4);
         }
+
         body {
-            padding: 1.5rem;
+            font-family: var(--font-family);
+            background: var(--bg-primary-light);
+            color: var(--text-primary-light);
+            line-height: 1.5;
+            transition: background 0.2s ease-in-out, color 0.2s ease-in-out;
         }
-        .header-grid {
-            display: grid;
-            grid-template-columns: 1fr auto;
-            align-items: center;
-            margin-bottom: 1rem;
+
+        body[data-theme="dark"] {
+            --bg-primary-light: var(--bg-primary-dark);
+            --bg-secondary-light: var(--bg-secondary-dark);
+            --bg-tertiary-light: var(--bg-tertiary-dark);
+            --text-primary-light: var(--text-primary-dark);
+            --text-secondary-light: var(--text-secondary-dark);
+            --border-light: var(--border-dark);
+            --input-bg-light: var(--input-bg-dark);
+            --accent-light: var(--accent-dark);
+            --hover-light: var(--hover-dark);
+            --shadow-light: var(--shadow-dark);
         }
-        h1 {
-            text-align: left;
-            margin-bottom: 0;
-        }
-        legend, .bold-label {
-            font-weight: bold;
-        }
-        fieldset {
-            padding-bottom: 1rem;
-        }
-        .options-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
-            gap: 0.5rem 1.5rem;
-        }
-        label {
-            margin-bottom: 0; /* Override pico default */
-        }
-        article {
-            padding: 1rem 1.5rem 1.5rem 1.5rem;
-            margin-bottom: 1rem;
-        }
-        textarea {
-            font-family: monospace;
-            white-space: pre;
-            word-wrap: normal;
-            overflow-x: scroll;
-        }
-        .batch-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-            margin-top: 1rem;
-        }
-        /* Tweak for switch alignment */
-        [role="switch"] {
-            margin-bottom: 0;
-        }
+
+        .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+        .header h1 { font-size: 28px; font-weight: 600; }
+        .main-content { background: var(--bg-secondary-light); border: 1px solid var(--border-light); border-radius: var(--radius); box-shadow: var(--shadow-light); overflow: hidden; }
+        .tabs { display: flex; background: var(--bg-tertiary-light); border-bottom: 1px solid var(--border-light); }
+        .tab { flex-grow: 1; background: none; border: none; padding: 15px 20px; cursor: pointer; font-size: 14px; font-weight: 500; font-family: var(--font-family); color: var(--text-secondary-light); transition: all 0.2s ease; border-bottom: 2px solid transparent; }
+        .tab.active { color: var(--accent-light); border-bottom-color: var(--accent-light); background: var(--bg-secondary-light); }
+        .tab-content { display: none; padding: 24px; }
+        .tab-content.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; }
+        .form-section h3 { font-size: 18px; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .form-section h3 svg { width: 20px; height: 20px; }
+        .form-group label { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; color: var(--text-secondary-light); margin-bottom: 6px; }
+        input[type="text"], input[type="number"], select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-light); border-radius: var(--radius); background: var(--input-bg-light); color: var(--text-primary-light); font-size: 14px; font-family: var(--font-family); transition: border-color 0.2s ease; }
+        input:focus { outline: 2px solid transparent; border-color: var(--accent-light); }
+        .checkbox-group { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .checkbox-item { display: flex; align-items: center; gap: 8px; }
+        input[type="checkbox"] { width: 18px; height: 18px; accent-color: var(--accent-light); }
+        .output-section { margin-top: 24px; padding: 24px; background: var(--bg-tertiary-light); border-radius: var(--radius); }
+        .command-output { background: var(--bg-primary-light); border: 1px solid var(--border-light); padding: 16px; font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 14px; border-radius: var(--radius); word-break: break-all; min-height: 70px; margin-bottom: 16px; }
+        .command-list { max-height: 220px; overflow-y: auto; border: 1px solid var(--border-light); border-radius: var(--radius); background: var(--bg-primary-light); }
+        .command-item { padding: 10px 16px; border-bottom: 1px solid var(--border-light); font-family: 'Cascadia Code', 'Consolas', monospace; font-size: 13px; word-break: break-all; }
+        .command-item:last-child { border-bottom: none; }
+        .button-group { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
+        .btn { background: var(--bg-tertiary-light); color: var(--text-primary-light); border: 1px solid var(--border-light); border-radius: var(--radius); padding: 8px 16px; cursor: pointer; font-size: 14px; font-weight: 600; font-family: var(--font-family); transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn:hover { background: var(--border-light); }
+        .btn-primary { background: var(--accent-light); color: white; border-color: var(--accent-light); }
+        .btn-primary:hover { background: var(--hover-light); border-color: var(--hover-light); }
+        .btn svg { width: 16px; height: 16px; }
+        .theme-switch { display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
+        .switch { position: relative; display: inline-block; width: 40px; height: 20px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 20px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--accent-light); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .notification { position: fixed; bottom: 20px; right: 20px; background: var(--bg-secondary-light); color: var(--text-primary-light); padding: 16px 24px; border-radius: var(--radius); box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 10000; font-size: 14px; font-weight: 500; opacity: 0; transform: translateY(20px); transition: all 0.3s ease; }
+        .notification.show { opacity: 1; transform: translateY(0); }
+
+        /* Modal Styles */
+        .modal-backdrop { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; opacity: 0; transition: opacity 0.3s ease; pointer-events: none; }
+        .modal-backdrop.show { opacity: 1; pointer-events: auto; }
+        .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95); width: 90%; max-width: 800px; background: var(--bg-secondary-light); border-radius: var(--radius); box-shadow: 0 5px 15px rgba(0,0,0,0.3); z-index: 1001; opacity: 0; transition: all 0.3s ease; }
+        .modal.show { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; border-bottom: 1px solid var(--border-light); }
+        .modal-header h2 { font-size: 20px; font-weight: 600; margin: 0; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--text-secondary-light); }
+        .modal-body { padding: 24px; max-height: 70vh; overflow-y: auto; line-height: 1.6; }
+        .modal-body pre { white-space: pre-wrap; word-wrap: break-word; font-family: 'Cascadia Code', 'Consolas', monospace; background-color: var(--bg-primary-light); padding: 16px; border-radius: var(--radius); border: 1px solid var(--border-light); }
+        .spinner { border: 4px solid var(--border-light); border-top: 4px solid var(--accent-light); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; margin: 40px auto; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
     </style>
 </head>
-<body>
-    <main class="container">
-        <header class="header-grid">
-            <h1>Robocopy Pro</h1>
-            <label for="theme-switcher">
-              <input type="checkbox" id="theme-switcher" name="theme-switcher" role="switch">
-              Dark Mode
+<body data-theme="light">
+    <!-- Fluent UI Icons -->
+    <svg width="0" height="0" style="display:none;">
+        <symbol id="icon-folder" viewBox="0 0 20 20"><path fill="currentColor" d="M2 4a2 2 0 0 1 2-2h4.586a1 1 0 0 1 .707.293l2.414 2.414a1 1 0 0 0 .707.293H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V4Z"/></symbol>
+        <symbol id="icon-copy" viewBox="0 0 20 20"><path fill="currentColor" d="M7 3a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2H7ZM6 5a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V5Z"/><path fill="currentColor" d="M4.293 3.293A1 1 0 0 1 5 3h7a1 1 0 0 1 1 1v.5a.5.5 0 0 1-1 0V4H5a.5.5 0 0 0-.5.5v9a.5.5 0 0 0 .5.5H6v.5a.5.5 0 0 1-1 0V14a1 1 0 0 1-1-1V4.5a1 1 0 0 1 .293-.707Z"/></symbol>
+        <symbol id="icon-filter" viewBox="0 0 20 20"><path fill="currentColor" d="M3 5.5A1.5 1.5 0 0 1 4.5 4h11A1.5 1.5 0 0 1 17 5.5v1.23c0 .28-.11.55-.32.74L12 12.17V16a1 1 0 0 1-1.55.83l-2-1A1 1 0 0 1 8 15v-2.83L3.32 7.47A1.05 1.05 0 0 1 3 6.73V5.5ZM4.5 5a.5.5 0 0 0-.5.5v1.23c0 .09.04.18.11.25L9 11.62V15l2 1v-3.38l4.89-4.64a.55.55 0 0 0 .11-.25V5.5a.5.5 0 0 0-.5-.5h-11Z"/></symbol>
+        <symbol id="icon-log" viewBox="0 0 20 20"><path fill="currentColor" d="M3 3.5A1.5 1.5 0 0 1 4.5 2h11A1.5 1.5 0 0 1 17 3.5v13A1.5 1.5 0 0 1 15.5 18h-11A1.5 1.5 0 0 1 3 16.5v-13ZM4.5 3a.5.5 0 0 0-.5.5v13a.5.5 0 0 0 .5.5h11a.5.5 0 0 0 .5-.5v-13a.5.5 0 0 0-.5-.5h-11ZM6 6.5A.5.5 0 0 1 6.5 6h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 3A.5.5 0 0 1 6.5 9h7a.5.5 0 0 1 0 1h-7a.5.5 0 0 1-.5-.5Zm0 3A.5.5 0 0 1 6.5 12h4a.5.5 0 0 1 0 1h-4a.5.5 0 0 1-.5-.5Z"/></symbol>
+        <symbol id="icon-lightning" viewBox="0 0 20 20"><path fill="currentColor" d="M11.26 2.06a.75.75 0 0 1 .74.02l.09.07l5.25 6a.75.75 0 0 1-.4 1.26l-.1.04h-4.2l.5 5.25a.75.75 0 0 1-1.3.51l-.07-.1L6.44 9.1a.75.75 0 0 1 .4-1.26l.1-.04H11V2.75a.75.75 0 0 1 .26-.69Zm.24.94v4.56a.75.75 0 0 1-1.14.65L10 8.01L5.61 13.06l-.33-3.47a.75.75 0 0 1 .74-.8h4.23a.75.75 0 0 1 .63.34l.06.12l1.62-3.23Z"/></symbol>
+        <symbol id="icon-plus" viewBox="0 0 20 20"><path fill="currentColor" d="M9.5 3.5a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5a.5.5 0 0 1 .5-.5Z"/></symbol>
+        <symbol id="icon-download" viewBox="0 0 20 20"><path fill="currentColor" d="M3 14.5A1.5 1.5 0 0 1 4.5 13H15a1.5 1.5 0 0 1 1.5 1.5v1A1.5 1.5 0 0 1 15 17H4.5A1.5 1.5 0 0 1 3 15.5v-1ZM15 14h-5.5v2h5.5a.5.5 0 0 0 .5-.5v-1a.5.5 0 0 0-.5-.5H15Z"/><path fill="currentColor" d="m9.5 2.05a.5.5 0 0 1 .5.5v9.8a.5.5 0 0 1-1 0V2.55a.5.5 0 0 1 .5-.5Z"/><path fill="currentColor" d="m6.65 9.35l-1.06 1.06l3.94 3.94a.51.51 0 0 0 .71 0l3.94-3.94l-1.06-1.06L9.75 12.7Z"/></symbol>
+        <symbol id="icon-sparkle" viewBox="0 0 20 20"><path fill="currentColor" d="m13.23 6.77l.5-1.28l1.28-.5a.5.5 0 0 0 0-.9l-1.28-.5l-.5-1.28a.5.5 0 0 0-.9 0l-.5 1.28l-1.28.5a.5.5 0 0 0 0 .9l1.28.5l.5 1.28a.5.5 0 0 0 .9 0ZM5.5 8a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-2ZM11.1 11.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-2ZM9.5 3a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-1 0v-1a.5.5 0 0 1 .5-.5ZM4.72 4.72a.5.5 0 0 1 .708 0l.707.707a.5.5 0 0 1-.707.707l-.707-.707a.5.5 0 0 1 0-.707ZM10 6.5a.5.5 0 0 0-.5.5v2a.5.5 0 0 0 .5.5h2a.5.5 0 0 0 .5-.5v-2a.5.5 0 0 0-.5-.5h-2Z"/></symbol>
+    </svg>
+
+    <div class="container">
+        <div class="header">
+            <h1>Robocopy GUI</h1>
+            <label class="theme-switch" for="theme-toggle" title="Toggle dark mode">
+                <span>Theme</span>
+                <span class="switch">
+                    <input type="checkbox" id="theme-toggle">
+                    <span class="slider"></span>
+                </span>
             </label>
-        </header>
+        </div>
 
-        <article>
-             <fieldset>
-                <legend>Source & Destination</legend>
-                <div class="grid">
-                     <label for="source" class="bold-label">Source Path:
-                        <input type="text" id="source" name="source" placeholder="C:\source\folder">
-                    </label>
-                    <label for="destination" class="bold-label">Destination Path:
-                        <input type="text" id="destination" name="destination" placeholder="F:\destination\folder">
-                    </label>
-                </div>
-            </fieldset>
-
-            <fieldset>
-                <legend>Options</legend>
-                <div class="options-grid">
-                    <fieldset>
-                        <legend>Copy</legend>
-                        <label for="copySubdirectories"><input type="checkbox" id="copySubdirectories" name="S">/S (Subdirs)</label>
-                        <label for="copyEmptySubdirectories"><input type="checkbox" id="copyEmptySubdirectories" name="E">/E (Empty Subdirs)</label>
-                        <label for="mirror"><input type="checkbox" id="mirror" name="MIR">/MIR (Mirror)</label>
-                        <label for="copyall"><input type="checkbox" id="copyall" name="COPYALL">/COPYALL</label>
-                        <label for="restartable"><input type="checkbox" id="restartable" name="Z">/Z (Restartable)</label>
-                        <label for="backup"><input type="checkbox" id="backup" name="B">/B (Backup Mode)</label>
-                        <label for="moveFiles"><input type="checkbox" id="moveFiles" name="MOV">/MOV (Move Files)</label>
-                        <label for="moveFilesAndDirs"><input type="checkbox" id="moveFilesAndDirs" name="MOVE">/MOVE (Move Dirs)</label>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>File Selection</legend>
-                        <label for="xo"><input type="checkbox" id="xo" name="XO">/XO (Exclude Older)</label>
-                        <label for="includeSame"><input type="checkbox" id="includeSame" name="IS">/IS (Include Same)</label>
-                        <label for="includeTweaked"><input type="checkbox" id="includeTweaked" name="IT">/IT (Include Tweaked)</label>
-                        <label for="excludeFiles">/XF (Excl. Files):
-                            <input type="text" id="excludeFiles" name="XF" placeholder="*.tmp *.bak">
-                        </label>
-                        <label for="excludeDirs">/XD (Excl. Dirs):
-                            <input type="text" id="excludeDirs" name="XD" placeholder="temp recycled">
-                        </label>
-                    </fieldset>
-                    
-                    <fieldset>
-                        <legend>Advanced</legend>
-                        <label for="copyFlags">/COPY:flags:
-                            <input type="text" id="copyFlags" name="COPY" placeholder="DAT">
-                        </label>
-                         <label for="dcopyFlags">/DCOPY:flags:
-                            <input type="text" id="dcopyFlags" name="DCOPY" placeholder="DAT">
-                        </label>
-                        <label for="multithread">/MT:n (Threads):
-                            <input type="number" id="multithread" name="MT" min="1" max="128" placeholder="8">
-                        </label>
-                         <label for="level">/LEV:n (Levels):
-                            <input type="number" id="level" name="LEV" min="1">
-                        </label>
-                    </fieldset>
-
-                    <fieldset>
-                        <legend>Retry & Logging</legend>
-                         <label for="retries">/R:n (Retries):
-                            <input type="number" id="retries" name="R" min="0" value="1">
-                        </label>
-                        <label for="waitTime">/W:n (Wait Time s):
-                            <input type="number" id="waitTime" name="W" min="0" value="5">
-                        </label>
-                        <label for="verbose"><input type="checkbox" id="verbose" name="V">/V (Verbose)</label>
-                        <label for="noProgress"><input type="checkbox" id="noProgress" name="NP">/NP (No Progress)</label>
-                        <label for="logFile">/LOG:file:
-                            <input type="text" id="logFile" name="LOG" placeholder="C:\logs\robocopy.log">
-                        </label>
-                        <label for="logAppendFile">/LOG+:file (append):
-                            <input type="text" id="logAppendFile" name="LOG+" placeholder="C:\logs\robocopy.log">
-                        </label>
-                    </fieldset>
-                </div>
-            </fieldset>
-        </article>
-
-        <article>
-            <h2 class="bold-label">Generated Command</h2>
-            <textarea id="generatedCommand" rows="3"></textarea>
-            <div class="batch-buttons">
-                <button id="addToBatch">Add to Batch Script</button>
-                <button id="downloadBatch" class="contrast">Download Batch File</button>
+        <div class="main-content">
+            <div class="tabs">
+                <button class="tab active" onclick="switchTab(event, 'basic')">Basic Options</button>
+                <button class="tab" onclick="switchTab(event, 'advanced')">Advanced Options</button>
             </div>
-        </article>
 
-        <article>
-            <h2 class="bold-label">Batch Script Content</h2>
-            <textarea id="batchContent" rows="8" readonly placeholder="Your generated commands will appear here..."></textarea>
-        </article>
-    </main>
+            <div id="basic" class="tab-content active">
+                <div class="form-grid">
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-folder"/></svg> Source & Destination</h3>
+                        <div class="form-group"> <label for="source">Source Path</label> <input type="text" id="source" placeholder="C:\Source\"> </div>
+                        <div class="form-group"> <label for="destination">Destination Path</label> <input type="text" id="destination" placeholder="D:\Backup\"> </div>
+                        <div class="form-group"> <label for="files">File Pattern</label> <input type="text" id="files" value="*.*"> </div>
+                    </div>
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-copy"/></svg> Common Copy Options</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" id="e"><label for="e">Subdirectories (/E)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="s"><label for="s">Non-Empty Subdirs (/S)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="mir"><label for="mir">Mirror (/MIR)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="purge"><label for="purge">Purge (/PURGE)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="z"><label for="z">Restartable Mode (/Z)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="b"><label for="b">Backup Mode (/B)</label></div>
+                        </div>
+                    </div>
+                     <div class="form-section">
+                        <h3><svg><use href="#icon-filter"/></svg> Basic File Filtering</h3>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" id="xo"><label for="xo">Exclude Older (/XO)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="xc"><label for="xc">Exclude Changed (/XC)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="xn"><label for="xn">Exclude Newer (/XN)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="is"><label for="is">Include Same (/IS)</label></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-lightning"/></svg> Performance</h3>
+                        <div class="form-group">
+                            <label for="mt">Multi-threaded (/MT)</label>
+                            <input type="number" id="mt" min="1" max="128" placeholder="Default is 8">
+                        </div>
+                         <div class="form-group">
+                             <div class="checkbox-item"><input type="checkbox" id="j"><label for="j">Unbuffered I/O (/J)</label></div>
+                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="advanced" class="tab-content">
+                <div class="form-grid">
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-copy"/></svg> Advanced Copy Options</h3>
+                        <div class="form-group"><label for="copy">Copy Flags (/COPY)</label><input type="text" id="copy" placeholder="Default: DAT"></div>
+                        <div class="form-group"><label for="dcopy">Directory Copy Flags (/DCOPY)</label><input type="text" id="dcopy" placeholder="Default: DA"></div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" id="copyall"><label for="copyall">Copy All (/COPYALL)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="sec"><label for="sec">Copy Security (/SEC)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="secfix"><label for="secfix">Fix Security (/SECFIX)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="timfix"><label for="timfix">Fix Timestamps (/TIMFIX)</label></div>
+                        </div>
+                    </div>
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-log"/></svg> Logging</h3>
+                        <div class="form-group"><label for="log">Log File Path (/LOG or /LOG+)</label><input type="text" id="log" placeholder="C:\Logs\robocopy.log"></div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" id="log_append"><label for="log_append">Append to Log (/LOG+)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="v"><label for="v">Verbose (/V)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="ts"><label for="ts">Include Timestamps (/TS)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="fp"><label for="fp">Include Full Path (/FP)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="np"><label for="np">No Progress (/NP)</label></div>
+                            <div class="checkbox-item"><input type="checkbox" id="nfl"><label for="nfl">No File List (/NFL)</label></div>
+                        </div>
+                    </div>
+                     <div class="form-section">
+                        <h3><svg><use href="#icon-filter"/></svg> Advanced File Filtering</h3>
+                        <div class="form-group"><label for="xf">Exclude Files (/XF)</label><input type="text" id="xf" placeholder="*.tmp *.bak"></div>
+                        <div class="form-group"><label for="xd">Exclude Directories (/XD)</label><input type="text" id="xd" placeholder="Temp System*"></div>
+                        <div class="form-group"><label for="max">Max File Size (bytes) (/MAX)</label><input type="number" id="max" min="0"></div>
+                        <div class="form-group"><label for="min">Min File Size (bytes) (/MIN)</label><input type="number" id="min" min="0"></div>
+                    </div>
+                    <div class="form-section">
+                        <h3><svg><use href="#icon-lightning"/></svg> Retry & Timing</h3>
+                        <div class="form-group"><label for="r">Retry Count (/R)</label><input type="number" id="r" min="0" placeholder="Default: 1,000,000"></div>
+                        <div class="form-group"><label for="w">Wait Time (seconds) (/W)</label><input type="number" id="w" min="0" placeholder="Default: 30"></div>
+                        <div class="checkbox-group">
+                            <div class="checkbox-item"><input type="checkbox" id="tbd"><label for="tbd">Wait for Sharenames (/TBD)</label></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <h3>Generated Command</h3>
+                <div class="command-output" id="commandOutput"></div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="addToQueue()"><svg><use href="#icon-plus"/></svg> Add to Batch</button>
+                    <button class="btn" onclick="copyCommand()"><svg><use href="#icon-copy"/></svg> Copy Command</button>
+                    <button class="btn" onclick="explainCommand()"><svg><use href="#icon-sparkle"/></svg> Explain</button>
+                </div>
+            </div>
+
+            <div class="output-section" id="queueSection" style="display: none;">
+                <h3>Batch Script Queue</h3>
+                <div class="command-list" id="commandQueue"></div>
+                <div class="button-group">
+                    <button class="btn btn-primary" onclick="downloadBatch()"><svg><use href="#icon-download"/></svg> Download Batch File</button>
+                     <button class="btn" onclick="analyzeBatch()"><svg><use href="#icon-sparkle"/></svg> Analyze</button>
+                    <button class="btn" onclick="clearQueue()">Clear Queue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="notification" id="notification"></div>
+
+    <!-- Modal -->
+    <div class="modal-backdrop" id="modalBackdrop">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h2 id="modalTitle"></h2>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body" id="modalBody"></div>
+        </div>
+    </div>
+
 
     <script>
-        const form = document.querySelector('main');
-        const generatedCommand = document.getElementById('generatedCommand');
-        const batchContent = document.getElementById('batchContent');
-        const addToBatchBtn = document.getElementById('addToBatch');
-        const downloadBatchBtn = document.getElementById('downloadBatch');
-        const themeSwitcher = document.getElementById('theme-switcher');
-        const htmlElement = document.documentElement;
+        let commandQueue = [];
+        const body = document.body;
+        const themeToggle = document.getElementById('theme-toggle');
 
-        let batchCommands = ["@echo off", ""];
-
-        // --- THEME SWITCHER LOGIC ---
-        function setTheme(theme) {
-            htmlElement.setAttribute('data-theme', theme);
-            localStorage.setItem('theme', theme);
-            themeSwitcher.checked = theme === 'dark';
-        }
-
-        themeSwitcher.addEventListener('change', () => {
-            const theme = themeSwitcher.checked ? 'dark' : 'light';
-            setTheme(theme);
-        });
-
-        // Load saved theme from localStorage on page load
         document.addEventListener('DOMContentLoaded', () => {
-            const savedTheme = localStorage.getItem('theme') || 'light';
+            const savedTheme = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             setTheme(savedTheme);
-            generateCommand(); // Generate command on load
-            updateBatchContent(); // Update batch view on load
+            document.querySelectorAll('input, select').forEach(input => {
+                input.addEventListener('input', generateCommand);
+                input.addEventListener('change', generateCommand);
+            });
+            generateCommand();
         });
-        
-        // --- ROBOCOPY LOGIC ---
-        function generateCommand() {
-            let command = 'robocopy ';
 
+        const setTheme = (theme) => {
+            body.dataset.theme = theme;
+            themeToggle.checked = theme === 'dark';
+            localStorage.setItem('theme', theme);
+        };
+
+        themeToggle.addEventListener('change', () => setTheme(themeToggle.checked ? 'dark' : 'light'));
+
+        const switchTab = (evt, tabName) => {
+            document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            evt.currentTarget.classList.add('active');
+        };
+
+        const generateCommand = () => {
+            let command = 'robocopy ';
             const source = document.getElementById('source').value.trim();
             const destination = document.getElementById('destination').value.trim();
+            const files = document.getElementById('files').value.trim() || '*.*';
 
-            if (source && destination) {
-                command += `"${source}" "${destination}" `;
-            } else {
-                generatedCommand.value = 'Please enter source and destination paths.';
+            if (!source || !destination) {
+                document.getElementById('commandOutput').textContent = 'Please provide a source and destination path.';
                 return;
             }
 
-            const inputs = form.querySelectorAll('input[type="checkbox"], input[type="text"], input[type="number"]');
+            command += `"${source}" "${destination}" ${files}`;
 
-            inputs.forEach(input => {
-                if (input.type === 'checkbox' && input.checked) {
-                    if (!['source', 'destination', 'theme-switcher'].includes(input.id)) {
-                        command += `/${input.name.toUpperCase()} `;
-                    }
-                } else if ((input.type === 'text' || input.type === 'number') && input.value.trim() !== '' && !['source', 'destination'].includes(input.id)) {
-                    const val = input.value.trim();
-                    const name = input.name.toUpperCase();
-                    // For options that take colon-separated values
-                    if (['R', 'W', 'COPY', 'DCOPY', 'LEV', 'LOG', 'LOG+', 'XF', 'XD', 'MT'].includes(name)) {
-                         command += `/${name}:${val} `;
-                    }
+            const options = {
+                checkbox: ['e', 's', 'mir', 'purge', 'z', 'b', 'xo', 'xc', 'xn', 'is', 'j', 'copyall', 'sec', 'secfix', 'timfix', 'log_append', 'v', 'ts', 'fp', 'np', 'nfl', 'tbd'],
+                value: ['mt', 'copy', 'dcopy', 'log', 'xf', 'xd', 'max', 'min', 'r', 'w']
+            };
+
+            options.checkbox.forEach(id => {
+                if(document.getElementById(id).checked) {
+                    let optionName = id.toUpperCase();
+                    if(id === 'log_append') optionName = 'LOG+';
+                    command += ` /${optionName}`;
                 }
             });
 
-            generatedCommand.value = command.trim().replace(/\s+/g, ' ');
-        }
+            options.value.forEach(id => {
+                const element = document.getElementById(id);
+                if(element && element.value.trim()){
+                    command += ` /${id.toUpperCase()}:${element.value.trim()}`;
+                }
+            });
 
-        function updateBatchContent() {
-            batchContent.value = batchCommands.join('\n');
-        }
+            document.getElementById('commandOutput').textContent = command.replace(/\s\s+/g, ' ');
+        };
 
-        addToBatchBtn.addEventListener('click', () => {
-            const command = generatedCommand.value;
+        const copyCommand = () => {
+            const command = document.getElementById('commandOutput').textContent;
             if (command && !command.startsWith('Please')) {
-                batchCommands.push(command);
-                updateBatchContent();
+                navigator.clipboard.writeText(command).then(() => showNotification('Command copied to clipboard!'));
+            }
+        };
+
+        const addToQueue = () => {
+            const command = document.getElementById('commandOutput').textContent;
+            if (command && !command.startsWith('Please')) {
+                commandQueue.push(command);
+                updateQueueDisplay();
+                showNotification('Command added to batch queue!');
+            }
+        };
+
+        const updateQueueDisplay = () => {
+            const queueSection = document.getElementById('queueSection');
+            const queueList = document.getElementById('commandQueue');
+            queueSection.style.display = commandQueue.length > 0 ? 'block' : 'none';
+            queueList.innerHTML = commandQueue.map((cmd, index) => `<div class="command-item">${index + 1}. ${cmd}</div>`).join('');
+        };
+
+        const clearQueue = () => {
+            commandQueue = [];
+            updateQueueDisplay();
+            showNotification('Queue cleared!');
+        };
+
+        const downloadBatch = () => {
+            if (commandQueue.length === 0) return showNotification('Queue is empty!');
+
+            let content = `@echo off\nTITLE Robocopy Batch Script\n\n`;
+            commandQueue.forEach((cmd, i) => {
+                content += `ECHO. && ECHO [${i+1}/${commandQueue.length}] EXECUTING: \nECHO ${cmd}\n${cmd}\n\n`;
+            });
+            content += 'ECHO. && ECHO All tasks complete. && pause';
+
+            const blob = new Blob([content], { type: 'application/bat' });
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(blob);
+            a.download = `robocopy_script_${Date.now()}.bat`;
+            a.click();
+            URL.revokeObjectURL(a.href);
+            showNotification('Batch file download started!');
+        };
+
+        const showNotification = (message) => {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.classList.add('show');
+            setTimeout(() => notification.classList.remove('show'), 3000);
+        };
+
+        // --- Modal Functions ---
+        const modalBackdrop = document.getElementById('modalBackdrop');
+        const modal = document.getElementById('modal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+
+        const showModal = (title, content) => {
+            modalTitle.textContent = title;
+            modalBody.innerHTML = content;
+            modalBackdrop.classList.add('show');
+            modal.classList.add('show');
+        };
+
+        const closeModal = () => {
+            modalBackdrop.classList.remove('show');
+            modal.classList.remove('show');
+        };
+
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                closeModal();
             }
         });
 
-        downloadBatchBtn.addEventListener('click', () => {
-            if (batchCommands.length > 2) { // more than just @echo off and a blank line
-                batchCommands.push("\n@echo.");
-                batchCommands.push("@echo Robocopy script finished.");
-                batchCommands.push("@pause");
-                const batchText = batchCommands.join('\r\n');
-                const blob = new Blob([batchText], { type: 'application/bat' });
-                const a = document.createElement('a');
-                a.href = URL.createObjectURL(blob);
-                a.download = 'robocopy_script.bat';
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                // remove the pause command after download
-                batchCommands.pop();
-                batchCommands.pop();
-                batchCommands.pop();
-            } else {
-                alert('No commands in the batch. Please generate and add a command first.');
+        // --- Gemini API Functions ---
+        const callGeminiAPI = async (prompt) => {
+            const apiKey = ""; // Left blank as per instructions
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`;
+
+            const payload = {
+                contents: [{
+                    role: "user",
+                    parts: [{ text: prompt }]
+                }]
+            };
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API Error: ${response.statusText}`);
+                }
+
+                const result = await response.json();
+
+                if (result.candidates && result.candidates.length > 0 &&
+                    result.candidates[0].content && result.candidates[0].content.parts &&
+                    result.candidates[0].content.parts.length > 0) {
+                    return result.candidates[0].content.parts[0].text;
+                } else {
+                   return "Error: Could not get a valid response from the AI. The response might be empty or blocked.";
+                }
+            } catch (error) {
+                console.error('Gemini API call failed:', error);
+                return `Error: Could not connect to the AI service. Please check your connection and try again. Details: ${error.message}`;
             }
-        });
-        
-        form.addEventListener('input', generateCommand);
+        };
+
+        const explainCommand = async () => {
+            const command = document.getElementById('commandOutput').textContent;
+            if (!command || command.startsWith('Please')) {
+                showNotification("Please generate a command first.");
+                return;
+            }
+
+            showModal("✨ AI Command Explanation", '<div class="spinner"></div>');
+
+            const prompt = `You are a helpful expert on the Windows Robocopy utility. Explain the following Robocopy command in a clear, easy-to-understand way for a beginner. Describe the overall purpose of the command, and then list each parameter and what it does.\n\nCommand: \`${command}\``;
+
+            const explanation = await callGeminiAPI(prompt);
+            modalBody.innerHTML = `<pre>${explanation}</pre>`;
+        };
+
+        const analyzeBatch = async () => {
+            if (commandQueue.length === 0) {
+                showNotification("The batch queue is empty.");
+                return;
+            }
+
+            showModal("✨ AI Batch Analysis", '<div class="spinner"></div>');
+
+            const script = commandQueue.join('\n');
+            const prompt = `You are a helpful expert on Windows Robocopy scripting. Analyze the following batch script. Provide a high-level summary of what the script will do. Then, point out any potential issues, conflicts, or redundancies between the commands. Finally, suggest any optimizations or best practices that could improve this script. Format your response clearly with Markdown.\n\nScript:\n---\n${script}`;
+
+            const analysis = await callGeminiAPI(prompt);
+            modalBody.innerHTML = `<pre>${analysis}</pre>`;
+        };
 
     </script>
 </body>
