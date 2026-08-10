@@ -1,6 +1,10 @@
+
+
 # Robocopy Command Generator: A Modern GUI for Seamless File Synchronization
 
 Effortlessly generate complex Robocopy commands for Windows with this intuitive and modern HTML tool. Designed for both novice and experienced users, this graphical user interface (GUI) simplifies the process of creating robust file and folder synchronization scripts. The tool provides access to a comprehensive set of Robocopy options, logically organized for ease of use. Additionally, it offers the unique capability to concatenate multiple commands and download them as a single, ready-to-run batch file.
+
+No installation is required; simply open the HTML file in any modern web browser to start using the tool.
 
 The clean and minimalist interface, built with the lightweight Pico.css framework, ensures a user-friendly experience. Options are grouped into logical sections such as "Source and Destination," "Copy Options," "File Selection," "Retry Options," and "Logging," allowing users to quickly locate and configure the desired settings.
 
