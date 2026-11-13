@@ -33,7 +33,6 @@ function build(app){
   body=body.slice(0,i)+tools+body.slice(j+6);
   [i,j]=between(body,'<nav class="rail-group" aria-label="Reference">','</nav>','reference nav');
   body=body.slice(0,i)+body.slice(j+6);
-  body=rep(body,'<symbol id="i-import"','<symbol id="i-ext" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></symbol>\n  <symbol id="i-import"');
 
   /* script: keep one tool */
   {
@@ -55,7 +54,7 @@ function build(app){
   script=rep(script,"  paintSteps();\n}\nfunction loadValues","  paintSteps();persist();\n}\nfunction loadValues");
   script=rep(script,"function renderQueue(){\n","function renderQueue(){\n  persist();\n");
   script=rep(script,"Jobs run top to bottom. Sample jobs are loaded so you can try reordering and exporting.","Jobs run top to bottom. Export them together as one script.");
-  script=rep(script,"<button class=\"btn primary grow\" type=\"button\" data-q=\"copyscript\" ${queue.length?'':'disabled'}>${ic('copy')}Copy script</button>","<button class=\"btn primary grow\" type=\"button\" data-q=\"download\" ${queue.length?'':'disabled'}>${ic('import')}Download .${fmt}</button><button class=\"btn sec grow\" type=\"button\" data-q=\"copyscript\" ${queue.length?'':'disabled'}>${ic('copy')}Copy script</button>");
+  script=rep(script,"<button class=\"btn primary grow\" type=\"button\" data-q=\"copyscript\" ${queue.length?'':'disabled'}>${ic('copy')}Copy script</button>","<button class=\"btn primary grow\" type=\"button\" data-q=\"download\" ${queue.length?'':'disabled'}>${ic('download')}Download .${fmt}</button><button class=\"btn sec grow\" type=\"button\" data-q=\"copyscript\" ${queue.length?'':'disabled'}>${ic('copy')}Copy script</button>");
   script=rep(script,"else if(qa==='copyscript')","else if(qa==='download')downloadScript();\n    else if(qa==='copyscript')");
   script=rep(script,"function renderQueue(){",snip('download.snip')+"function renderQueue(){");
   [i,j]=between(script,'/* ------------------------------------------------------------------ design system */','/* ------------------------------------------------------------------ palette */','design system');
@@ -68,7 +67,7 @@ function build(app){
   script=rep(script,"else if(page==='profiles')renderProfiles();else renderSystem();","else renderProfiles();");
   if(/renderSystem|#system/.test(script))throw new Error('leftover design-system reference');
 
-  const fav=encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="${A.color}"/><path d="M9 11h8a3 3 0 0 1 0 6h-4a3 3 0 0 0 0 6h10" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`);
+  const fav=encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="8" fill="${A.color}"/><g transform="translate(6 6) scale(.8333)" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 19a1 1 0 0 1-1-1v-2a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2a1 1 0 0 1-1 1z" /><path d="M17 21v-2" /><path d="M19 14V6.5a1 1 0 0 0-7 0v11a1 1 0 0 1-7 0V10" /><path d="M21 21v-2" /><path d="M3 5V3" /><path d="M4 10a2 2 0 0 1-2-2V6a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2a2 2 0 0 1-2 2z" /><path d="M7 5V3" /></g></svg>`);
   const css=style.replace(/\/\* Hallmark:[^\n]*\n/,'/* Conduit design system. Shared by Mirror (robocopy-gui) and Fetch (wget-gui). Keep tokens and components identical in both. */\n').replace(/\/\* Layout:[^\n]*\n/,'');
   return `<!doctype html>
 <html lang="en">

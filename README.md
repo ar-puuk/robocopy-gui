@@ -29,6 +29,10 @@ node build.js    # rewrites ../index.html and ../../wget-gui/index.html if that 
 
 `design/shell.html` is the shared source and design reference (it includes a Design system page and both tools). `design/e2e.js` is a jsdom smoke test, run as `node e2e.js ../index.html` after installing `jsdom`.
 
+## Credits
+
+Icons are from [Lucide](https://lucide.dev) (ISC license), inlined unmodified. Fonts are Bricolage Grotesque, Instrument Sans and JetBrains Mono from Google Fonts.
+
 ## License
 
 See [LICENSE](LICENSE).
