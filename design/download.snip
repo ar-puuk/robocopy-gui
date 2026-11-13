@@ -1,0 +1,10 @@
+function downloadScript(){
+  const sc=script(fmt);if(!sc)return;
+  const text=(fmt==='ps1'?'﻿':'')+sc.replace(/\n/g,'\r\n')+'\r\n';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download=(APP==='mirror'?'robocopy-jobs':'wget-jobs')+'.'+fmt;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Script downloaded');
+}

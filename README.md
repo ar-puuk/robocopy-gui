@@ -1,15 +1,34 @@
-# Robocopy Command Generator: A Modern GUI for Seamless File Synchronization
+# Mirror: a Robocopy command builder for Windows
 
-Effortlessly generate complex Robocopy commands for Windows with this intuitive and modern HTML tool. Designed for both novice and experienced users, this graphical user interface (GUI) simplifies the process of creating robust file and folder synchronization scripts. The tool provides access to a comprehensive set of Robocopy options, logically organized for ease of use. Additionally, it offers the unique capability to concatenate multiple commands and download them as a single, ready-to-run batch file.
+Build Robocopy commands visually instead of memorising flags. Mirror covers every option in `robocopy /?` (97 settings), explains what each one does, warns before anything can delete files, and exports a queue of jobs as one `.bat` or `.ps1` script. It runs entirely in your browser. Nothing is uploaded.
 
-The clean and minimalist interface, built with the lightweight Pico.css framework, ensures a user-friendly experience. Options are grouped into logical sections such as "Source and Destination," "Copy Options," "File Selection," "Retry Options," and "Logging," allowing users to quickly locate and configure the desired settings.
+Mirror is part of **Conduit**, a pair of command builders that share one design system. Its sister app is [Fetch, the Wget builder](https://github.com/ar-puuk/wget-gui).
 
-## How to Use the Robocopy GUI
-The tool is straightforward to use:
-* **Specify Source and Destination:** Begin by entering the source and destination paths for your file transfer.
-* **Select Options:** Navigate through the various sections and select the desired Robocopy options using checkboxes for flags and text fields for parameters requiring values.
-* **Generate Command:** As you select options, the corresponding Robocopy command is dynamically generated and displayed in real-time.
-* **Add to Batch:** Once satisfied with a command, click the "Add to Batch" button to save it to a list.
-* **Combine and Download:** Repeat the process to add multiple commands. When ready, click the "Download Batch File" button to download a `.bat` file containing all the generated commands.
+## How to use it
 
-This tool eliminates the need to memorize Robocopy's extensive and sometimes complex syntax, reducing the risk of errors and saving valuable time.
+1. **Pick a starting point.** Choose a preset such as Daily backup or Exact mirror, or start from scratch.
+2. **Fill in the tabs.** Locations, What to do, Filters, Preserve, Performance, Automation, Logging and Advanced. Rarely used options stay hidden until you turn on Show advanced.
+3. **Watch the command.** It updates as you choose, with every flag explained and a clear warning for options that delete (Mirror, Move, Purge).
+4. **Add to queue.** Build several jobs, reorder them, then download one script. Stop on first failure is on by default.
+
+Other ways in:
+
+* **Find an option.** Type a name or a flag, such as `retry` or `/MT`, to search every tab at once.
+* **Paste a command.** Paste an existing `robocopy` command and the form fills in. Flags the builder does not recognise are kept under Advanced.
+* **Command palette.** `Ctrl+K` jumps to any option, preset or page. `Ctrl+Enter` adds the current command to the queue.
+* **Profiles.** Save a full set of options and load it later. Profiles, the queue and the form are remembered in this browser.
+
+## Development
+
+The whole app is one self-contained `index.html` with no build step to run it. It is generated from a shared source so that Mirror and Fetch keep identical design tokens and components:
+
+```
+cd design
+node build.js    # rewrites ../index.html and ../../wget-gui/index.html if that folder exists
+```
+
+`design/shell.html` is the shared source and design reference (it includes a Design system page and both tools). `design/e2e.js` is a jsdom smoke test, run as `node e2e.js ../index.html` after installing `jsdom`.
+
+## License
+
+See [LICENSE](LICENSE).

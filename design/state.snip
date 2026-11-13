@@ -1,0 +1,21 @@
+const KEY='conduit.'+APP;
+let profiles=[];
+(function(){
+  try{
+    const st=JSON.parse(localStorage.getItem(KEY+'.state')||'null');
+    if(st){
+      if(st.v)S[APP]={...blank(MODULES[APP]),...st.v};
+      if(Array.isArray(st.q))queue=st.q;
+      if(st.fmt==='bat'||st.fmt==='ps1')fmt=st.fmt;
+      if(typeof st.stop==='boolean')stopOnFail=st.stop;
+      if(typeof st.multi==='boolean')multi=st.multi;
+      if(typeof st.adv==='boolean')showAdv=st.adv;
+    }
+    const p=JSON.parse(localStorage.getItem(KEY+'.profiles')||'[]');
+    if(Array.isArray(p))profiles=p;
+  }catch(e){}
+  uid=1+Math.max(0,...queue.map(x=>+x.id||0),...profiles.map(p=>parseInt(String(p.id).slice(1),10)||0));
+})();
+function persist(){try{localStorage.setItem(KEY+'.state',JSON.stringify({v:S[APP],q:queue,fmt,stop:stopOnFail,multi,adv:showAdv}))}catch(e){}}
+const persistProfiles=()=>{try{localStorage.setItem(KEY+'.profiles',JSON.stringify(profiles))}catch(e){}};
+

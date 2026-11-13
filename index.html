@@ -1,1261 +1,1035 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RoboGUI Ultimate (Fluent)</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            /* Windows 11 Light Theme Palette */
-            --bg-app: #f3f3f3;
-            --bg-card: #ffffff;
-            --bg-input: #ffffff;
-            --bg-input-hover: #fcfcfc;
-            --bg-disabled: #f9f9f9;
-            --border-base: #e5e5e5;
-            --border-input: #d1d1d1;
-            --border-input-focus: #0067c0;
-            --text-primary: #1a1a1a;
-            --text-secondary: #5d5d5d;
-            --text-disabled: #a6a6a6;
-            --accent-default: #0067c0;
-            --accent-hover: #005a9e;
-            --accent-text: #ffffff;
-            --danger: #c42b1c;
-            --success: #107c10;
-            --warning-bg: #fff4ce;
-            --warning-text: #9d5d00;
-            
-            /* Dimensions & Effects */
-            --radius-sm: 4px;
-            --radius-md: 6px;
-            --radius-lg: 8px;
-            --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.04);
-            --shadow-flyout: 0 8px 16px rgba(0, 0, 0, 0.14);
-            
-            --font-stack: 'Segoe UI Variable', 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mirror, a Robocopy command builder | Conduit</title>
+<meta name="description" content="Build Robocopy commands visually for backups, syncs and moves. Every option explained, risky ones flagged, jobs exported as one script. Runs in your browser.">
+<meta name="theme-color" content="#0A7660">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2032%2032%22%3E%3Crect%20width%3D%2232%22%20height%3D%2232%22%20rx%3D%228%22%20fill%3D%22%230A7660%22%2F%3E%3Cpath%20d%3D%22M9%2011h8a3%203%200%200%201%200%206h-4a3%203%200%200%200%200%206h10%22%20fill%3D%22none%22%20stroke%3D%22%23fff%22%20stroke-width%3D%222.4%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%2F%3E%3C%2Fsvg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600&family=Instrument+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Conduit design system. Shared by Mirror (robocopy-gui) and Fetch (wget-gui). Keep tokens and components identical in both. */
+:root{
+  --font-display:'Bricolage Grotesque','Segoe UI',system-ui,sans-serif;
+  --font-body:'Instrument Sans','Segoe UI',system-ui,sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,Consolas,monospace;
 
-        [data-theme="dark"] {
-            /* Windows 11 Dark Theme Palette */
-            --bg-app: #202020;
-            --bg-card: #2c2c2c;
-            --bg-input: #333333;
-            --bg-input-hover: #3a3a3a;
-            --bg-disabled: #252525;
-            --border-base: #3e3e3e;
-            --border-input: #454545;
-            --border-input-focus: #4cc2ff;
-            --text-primary: #ffffff;
-            --text-secondary: #a0a0a0;
-            --text-disabled: #555555;
-            --accent-default: #4cc2ff;
-            --accent-hover: #4cc2ff; 
-            --accent-text: #000000;
-            --danger: #ff99a4;
-            --warning-bg: #433519;
-            --warning-text: #fce100;
-        }
+  --bg:#E8ECEA; --surface:#FAFBFA; --sunken:#F0F3F1; --raised:#FFFFFF;
+  --line:#D4DAD7; --line-2:#B9C3BE;
+  --ink:#0E1917; --ink-2:#44514D; --ink-3:#66736F;
+  --mirror:#0A7660; --fetch:#BA4F0A; --on-accent:#FFFFFF;
+  --danger:#B3261E; --warn:#7F5300; --ok:#1B7339;
+  --term:#0D1513; --term-line:#24332E; --term-ink:#D8E5E0; --term-dim:#849791;
+  --syn-bin:#6EE7C8; --syn-path:#F2C879; --syn-flag:#8CC4FF; --syn-val:#D2C2FA;
+  --shadow-1:0 1px 2px rgba(14,25,23,.06),0 1px 1px rgba(14,25,23,.04);
+  --shadow-2:0 12px 32px rgba(14,25,23,.16),0 2px 6px rgba(14,25,23,.08);
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+  --r-s:6px; --r-m:10px; --r-l:16px;
+  --gut:16px; --rail:248px;
+  --accent:var(--mirror);
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#090F0E; --surface:#111917; --sunken:#0D1412; --raised:#17211E;
+  --line:#223029; --line-2:#33463E;
+  --ink:#E7F0ED; --ink-2:#A5B4AF; --ink-3:#7F8F8A;
+  --mirror:#34C7A5; --fetch:#F0884A; --on-accent:#04120E;
+  --danger:#FF8076; --warn:#E8B04A; --ok:#5BD08A;
+  --term:#060B0A; --term-line:#1D2B27;
+  --shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 16px 40px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4);
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#090F0E; --surface:#111917; --sunken:#0D1412; --raised:#17211E;
+  --line:#223029; --line-2:#33463E;
+  --ink:#E7F0ED; --ink-2:#A5B4AF; --ink-3:#7F8F8A;
+  --mirror:#34C7A5; --fetch:#F0884A; --on-accent:#04120E;
+  --danger:#FF8076; --warn:#E8B04A; --ok:#5BD08A;
+  --term:#060B0A; --term-line:#1D2B27;
+  --shadow-1:0 1px 2px rgba(0,0,0,.4);
+  --shadow-2:0 16px 40px rgba(0,0,0,.55),0 2px 6px rgba(0,0,0,.4);
+  color-scheme:dark}
+[data-module="mirror"]{--accent:var(--mirror)}
+[data-module="fetch"]{--accent:var(--fetch)}
+@media (min-width:900px){:root{--gut:32px}}
 
-        body {
-            font-family: var(--font-stack);
-            background-color: var(--bg-app);
-            color: var(--text-primary);
-            transition: background-color 0.3s ease, color 0.3s ease;
-            height: 100vh;
-            overflow: hidden; 
-            display: flex;
-            flex-direction: column;
-        }
+*{box-sizing:border-box}
+html,body{overflow-x:clip}
+html{height:100%}
+body{margin:0;min-height:100%;background:var(--bg);color:var(--ink);font:400 15px/1.5 var(--font-body);-webkit-font-smoothing:antialiased}
+h1,h2,h3,p{margin:0}
+h1,h2,h3{font-family:var(--font-display);font-weight:600;text-wrap:balance;overflow-wrap:break-word;min-width:0;letter-spacing:-.01em}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:inherit}
+code,.mono{font-family:var(--font-mono)}
+small{font-size:13px;color:var(--ink-3)}
+.ic{width:18px;height:18px;flex:none;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px;transition:none}
 
-        /* --- Header --- */
-        .app-header {
-            height: 50px;
-            padding: 0 24px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border-base);
-            -webkit-app-region: drag;
-        }
+/* shell */
+.app{display:grid;grid-template-columns:var(--rail) minmax(0,1fr);min-height:100vh}
+.rail{position:sticky;top:0;align-self:start;height:100vh;display:flex;flex-direction:column;gap:20px;padding:20px 14px;background:var(--surface);border-right:1px solid var(--line);overflow:auto}
+.brand{display:flex;align-items:center;gap:10px;padding:2px 8px;text-decoration:none}
+.brand-mark{width:34px;height:34px;border-radius:10px;background:var(--ink);color:var(--bg);display:grid;place-items:center}
+.brand-mark .ic{width:20px;height:20px;stroke-width:2.2}
+.brand b{font:600 20px/1 var(--font-display);letter-spacing:-.02em}
+.rail-group{display:flex;flex-direction:column;gap:2px}
+.rail-group>span{font-size:13px;color:var(--ink-3);padding:0 10px 6px}
+.nav{display:flex;align-items:center;gap:11px;padding:8px 10px;border-radius:var(--r-m);text-decoration:none;color:var(--ink-2);font-weight:500;transition:background-color .15s,color .15s}
+.nav:hover{background:var(--sunken);color:var(--ink)}
+.nav[aria-current="page"]{background:var(--sunken);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
+.nav .tile{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;color:var(--on-accent)}
+.nav .tile .ic{width:16px;height:16px;stroke-width:2.2}
+.tile.m{background:var(--mirror)} .tile.f{background:var(--fetch)}
+.nav .count{margin-left:auto;font:500 12px var(--font-mono);background:var(--accent);color:var(--on-accent);border-radius:99px;padding:1px 8px;min-width:22px;text-align:center}
+.nav .count[hidden]{display:none}
+.rail-foot{margin-top:auto;padding:12px;border-radius:var(--r-m);background:var(--sunken);font-size:13px;color:var(--ink-2);display:flex;gap:10px}
+.rail-foot .ic{color:var(--accent);margin-top:2px}
 
-        .app-title {
-            font-size: 16px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .app-title i { color: var(--accent-default); font-size: 18px; }
+.main{min-width:0}
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1280px;margin:0 auto;display:flex;align-items:center;gap:12px;height:60px;padding-inline:max(var(--gut),env(safe-area-inset-left,0px)) max(var(--gut),env(safe-area-inset-right,0px))}
+.crumb{font-size:14px;color:var(--ink-3);display:flex;gap:8px;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.crumb b{color:var(--ink);font-weight:600}
+.search{margin-left:auto;display:flex;align-items:center;gap:10px;min-width:0;width:min(340px,100%);height:38px;padding:0 10px 0 12px;border-radius:var(--r-m);border:1px solid var(--line);background:var(--surface);color:var(--ink-3);cursor:pointer;transition:border-color .15s}
+.search:hover{border-color:var(--line-2)}
+.search span{flex:1;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+kbd{font:500 12px var(--font-mono);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:1px 6px;background:var(--sunken);color:var(--ink-2)}
+.wrap{max-width:1280px;margin:0 auto;padding:28px max(var(--gut),env(safe-area-inset-right,0px)) 72px max(var(--gut),env(safe-area-inset-left,0px));display:flex;flex-direction:column;gap:24px}
 
-        .theme-toggle-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            cursor: pointer;
-            padding: 8px;
-            border-radius: var(--radius-sm);
-            transition: background 0.2s;
-            -webkit-app-region: no-drag;
-        }
-        .theme-toggle-btn:hover { background-color: rgba(128,128,128,0.1); }
+/* buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:38px;padding:0 16px;border-radius:var(--r-m);border:1px solid var(--line-2);background:var(--surface);color:var(--ink);font-weight:600;font-size:14px;cursor:pointer;white-space:nowrap;transition:background-color .15s,border-color .15s,transform .1s,opacity .15s}
+.btn:hover{background:var(--sunken);border-color:var(--ink-3)}
+.btn:active{transform:translateY(1px)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.btn.primary:hover{background:color-mix(in srgb,var(--accent) 88%,var(--ink));border-color:transparent}
+.btn.ghost{border-color:transparent;background:transparent}
+.btn.ghost:hover{background:var(--sunken)}
+.btn.icon{width:38px;padding:0}
+.btn.danger-t:hover{color:var(--danger)}
+.btn[aria-disabled="true"],.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn.sm{height:32px;padding:0 12px;font-size:13px}
+.btn.sm.icon{width:32px;padding:0}
 
-        /* --- Layout --- */
-        .app-container {
-            display: flex;
-            flex: 1;
-            overflow: hidden;
-        }
+/* module header */
+.mhead{display:flex;align-items:center;gap:20px;flex-wrap:wrap;padding:24px;border:1px solid var(--line);border-radius:var(--r-l);background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 13%,var(--surface)),var(--surface) 62%)}
+.mhead .tile{width:64px;height:64px;border-radius:18px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center;box-shadow:var(--shadow-1)}
+.mhead .tile .ic{width:32px;height:32px;stroke-width:2}
+.mhead .txt{flex:1 1 320px;min-width:0;display:flex;flex-direction:column;gap:4px}
+.mhead h1{font-size:34px;line-height:1.1}
+.mhead p{color:var(--ink-2);max-width:56ch}
+.mhead .acts{display:flex;gap:8px;flex-wrap:wrap}
+.starts{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.starts>span{font-size:14px;color:var(--ink-3);margin-right:2px}
+.chip{display:inline-flex;align-items:center;gap:8px;height:34px;padding:0 14px;border-radius:99px;border:1px solid var(--line-2);background:var(--surface);font-weight:500;font-size:14px;cursor:pointer;transition:border-color .15s,background-color .15s,color .15s}
+.chip:hover{border-color:var(--accent);color:var(--accent)}
+.chip .ic{width:15px;height:15px}
 
-        .sidebar {
-            width: 250px;
-            background: var(--bg-card);
-            border-right: 1px solid var(--border-base);
-            padding: 16px 12px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            overflow-y: auto;
-        }
+/* builder */
+.builder{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:24px;align-items:start}
+.forms{display:flex;flex-direction:column;gap:16px;min-width:0}
+.prog{display:flex;flex-direction:column;gap:8px}
+.prog-t{display:flex;justify-content:space-between;gap:12px;font-size:14px;font-weight:600}
+.prog-t small{font-weight:500;font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:99px;background:var(--line);overflow:hidden}
+.track i{display:block;height:100%;border-radius:99px;background:var(--accent);transform-origin:left center;transform:scaleX(0);transition:transform .3s}
+.stepnav{display:flex;justify-content:space-between;gap:10px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line-2);overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tabs.more{-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 44px),transparent)}
+.tabs button{display:inline-flex;align-items:center;gap:8px;height:46px;padding:0 16px;border:0;border-bottom:2px solid transparent;margin-bottom:-1px;background:transparent;font-weight:600;font-size:14.5px;color:var(--ink-2);white-space:nowrap;cursor:pointer;border-radius:var(--r-s) var(--r-s) 0 0;transition:color .15s,background-color .15s,border-color .15s}
+.tabs button:hover{color:var(--ink);background:var(--sunken)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tc{font:500 12px/18px var(--font-mono);min-width:20px;text-align:center;padding:0 6px;border-radius:99px;background:var(--sunken);border:1px solid var(--line);color:var(--ink-2)}
+.tc:empty{display:none}
+.tabs button[aria-selected="true"] .tc{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.sec{border:1px solid var(--line);border-radius:var(--r-l);background:var(--surface);box-shadow:var(--shadow-1)}
+.sec-h{padding:18px 20px 14px;display:flex;flex-direction:column;gap:2px}
+.sec-h h3{font-size:19px}
+.sec-h p{color:var(--ink-3);font-size:14px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 20px;align-items:center;padding:13px 20px;border-top:1px solid var(--line);transition:opacity .15s}
+.row.in{grid-template-columns:minmax(0,1fr) minmax(0,250px)}
+.row.path{grid-template-columns:minmax(0,1fr)}
+.row.is-off{opacity:.5}
+.lbl{display:flex;flex-direction:column;gap:2px;min-width:0}
+.lbl label{font-weight:600;cursor:pointer}
+.lbl .top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.flag{font-size:12px;background:var(--sunken);border:1px solid var(--line);color:var(--ink-2);border-radius:5px;padding:0 6px;line-height:20px}
+.lbl small{overflow-wrap:anywhere}
+.ctl{display:flex;align-items:center;gap:12px}
+.inp{position:relative;display:flex;align-items:center}
+.inp .ic{position:absolute;left:12px;color:var(--ink-3);pointer-events:none}
+input[type=text],select{width:100%;height:40px;border:1px solid var(--line-2);border-radius:var(--r-m);background:var(--raised);padding:0 12px;transition:border-color .15s,box-shadow .15s}
+.inp .ic+input{padding-left:38px}
+input[type=text]:hover,select:hover{border-color:var(--ink-3)}
+input[type=text]:focus-visible,select:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+input[type=text]::placeholder{color:var(--ink-3);opacity:.8}
+input:disabled,select:disabled{cursor:not-allowed}
+.switch{position:relative;width:42px;height:24px;flex:none}
+.switch input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer;z-index:1}
+.switch i{position:absolute;inset:0;border-radius:99px;background:var(--line-2);transition:background-color .18s}
+.switch i::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--raised);box-shadow:var(--shadow-1);transition:transform .18s}
+.switch input:checked+i{background:var(--accent)}
+.switch input:checked+i::after{transform:translateX(18px)}
+.switch input:focus-visible+i{outline:2px solid var(--accent);outline-offset:2px;transition:none}
+.switch input:disabled{cursor:not-allowed}
+.modes{display:grid;grid-template-columns:repeat(var(--c,3),minmax(0,1fr));grid-auto-rows:1fr;align-items:stretch;gap:10px;padding:2px 20px 18px;border-top:0}
+.mode input{position:absolute;opacity:0;pointer-events:none}
+.mode{position:relative;display:flex;min-width:0}
+.mode label{display:flex;flex-direction:column;gap:4px;flex:1;min-height:132px;padding:14px;border-radius:var(--r-m);border:1px solid var(--line-2);background:var(--raised);cursor:pointer;transition:border-color .15s,box-shadow .15s,background-color .15s}
+.mode label b{font-family:var(--font-display);font-size:17px;font-weight:600}
+.mode label span{font-size:13px;color:var(--ink-2)}
+.mode label em{font-style:normal;font-size:13px;font-weight:600;margin-top:auto;padding-top:6px}
+.mode label em.risk-danger{color:var(--danger)} .mode label em.risk-caution{color:var(--warn)}
+.mode label:hover{border-color:var(--ink-3)}
+.mode input:checked+label{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 10%,var(--raised));box-shadow:0 0 0 1px var(--accent)}
+.mode input:focus-visible+label{outline:2px solid var(--accent);outline-offset:2px;transition:none}
+.swap{display:flex;justify-content:center;margin:-8px 0}
+.row.head{display:block;padding:16px 20px 8px;background:var(--sunken)}
+.row.head h4{margin:0;font:600 14px var(--font-body);color:var(--ink-2)}
+.chks{display:flex;flex-wrap:wrap;gap:6px}
+.chks label{position:relative;display:inline-flex}
+.chks input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}
+.chks span{display:inline-flex;align-items:center;height:30px;padding:0 12px;border-radius:99px;border:1px solid var(--line-2);background:var(--raised);font-size:13px;font-weight:500;color:var(--ink-2);transition:background-color .15s,border-color .15s,color .15s}
+.chks input:hover+span{border-color:var(--ink-3)}
+.chks input:checked+span{background:color-mix(in srgb,var(--accent) 14%,var(--raised));border-color:var(--accent);color:var(--ink)}
+.chks input:focus-visible+span{outline:2px solid var(--accent);outline-offset:2px;transition:none}
+.row textarea{min-height:84px;background:var(--raised)}
+.finder{display:flex;align-items:center;gap:8px 20px;flex-wrap:wrap}
+.finder .inp{flex:1 1 280px}
+.finder .fmt{margin-left:0;color:var(--ink-2)}
+.finder-n{font-size:13px;color:var(--ink-3)}
 
-        .content-area {
-            flex: 1;
-            padding: 24px;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-        }
+/* command panel */
+.side{position:sticky;top:76px;display:flex;flex-direction:column;gap:14px;max-height:calc(100vh - 92px);overflow:auto;padding:2px}
+.term{background:var(--term);color:var(--term-ink);border:1px solid var(--term-line);border-radius:var(--r-l);box-shadow:var(--shadow-2);overflow:hidden}
+.term-h{display:flex;align-items:center;gap:10px;padding:12px 14px 12px 18px;border-bottom:1px solid var(--term-line)}
+.term-h h2{font-size:16px;color:var(--term-ink)}
+.term-h small{color:var(--term-dim);margin-left:auto;font-variant-numeric:tabular-nums}
+.term pre{margin:0;padding:18px;font:400 13.5px/1.75 var(--font-mono);white-space:pre-wrap;overflow-wrap:anywhere;min-height:120px;max-height:300px;overflow:auto}
+.t-bin{color:var(--syn-bin);font-weight:500} .t-path{color:var(--syn-path)} .t-flag{color:var(--syn-flag)} .t-val{color:var(--syn-val)} .t-dim{color:var(--term-dim)}
+.term-f{display:flex;gap:8px;padding:12px;border-top:1px solid var(--term-line);flex-wrap:wrap}
+.term-f .btn.sec{background:transparent;color:var(--term-ink);border-color:var(--term-line)}
+.term-f .btn.sec:hover{background:var(--term-line)}
+.term-f .grow{flex:1 1 150px}
+.fmt{display:flex;align-items:center;gap:8px;margin-left:auto;font-size:13px;color:var(--term-dim)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-l);box-shadow:var(--shadow-1);padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.card h3{font-size:16px}
+.badge{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:99px;font-size:13px;font-weight:600;border:1px solid}
+.badge .ic{width:15px;height:15px}
+.badge.safe{color:var(--ok);border-color:color-mix(in srgb,var(--ok) 40%,transparent);background:color-mix(in srgb,var(--ok) 10%,var(--surface))}
+.badge.caution{color:var(--warn);border-color:color-mix(in srgb,var(--warn) 45%,transparent);background:color-mix(in srgb,var(--warn) 12%,var(--surface))}
+.badge.danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 45%,transparent);background:color-mix(in srgb,var(--danger) 10%,var(--surface))}
+.badge.info{color:var(--ink-2);border-color:var(--line-2);background:var(--sunken)}
+.notes{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--ink-2)}
+.explain{margin:0;padding:0;list-style:none;display:flex;flex-direction:column}
+.explain li{display:grid;grid-template-columns:minmax(0,118px) minmax(0,1fr);gap:12px;padding:9px 0;border-top:1px solid var(--line);font-size:14px;color:var(--ink-2)}
+.explain li:first-child{border-top:0;padding-top:0}
+.explain code{font-size:12.5px;color:var(--ink);overflow-wrap:anywhere}
+.empty{font-size:14px;color:var(--ink-3)}
 
-        /* --- Navigation Items --- */
-        .nav-item {
-            padding: 10px 16px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            font-size: 14px;
-            color: var(--text-primary);
-            transition: all 0.2s ease;
-            border: none;
-            background: none;
-            width: 100%;
-            text-align: left;
-            position: relative;
-        }
+/* queue and lists */
+.two{display:grid;grid-template-columns:minmax(0,1fr) 430px;gap:24px;align-items:start}
+.list{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:var(--r-l);background:var(--surface);box-shadow:var(--shadow-1)}
+.item{display:grid;grid-template-columns:auto 34px minmax(0,1fr) auto;gap:14px;align-items:center;padding:14px 16px;border-top:1px solid var(--line)}
+.item:first-child{border-top:0}
+.item .n{font:500 13px var(--font-mono);color:var(--ink-3);width:22px;text-align:right}
+.item .tile{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;color:var(--on-accent)}
+.item .tile .ic{width:18px;height:18px;stroke-width:2.1}
+.item h3{font:600 15px var(--font-body);letter-spacing:0}
+.item code{display:block;font-size:12.5px;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.item .a{display:flex;gap:2px}
+.seg{display:inline-flex;padding:3px;border-radius:var(--r-m);background:var(--sunken);border:1px solid var(--line)}
+.seg button{height:30px;padding:0 14px;border:0;border-radius:7px;background:transparent;font-weight:600;font-size:13px;color:var(--ink-2);cursor:pointer;transition:background-color .15s,color .15s}
+.seg button[aria-pressed="true"]{background:var(--raised);color:var(--ink);box-shadow:var(--shadow-1)}
+.page-h{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap}
+.page-h>div{flex:1 1 300px;display:flex;flex-direction:column;gap:4px}
+.page-h h1{font-size:34px;line-height:1.1}
+.page-h p{color:var(--ink-2);max-width:60ch}
+.blank{padding:44px 20px;text-align:center;color:var(--ink-2);display:flex;flex-direction:column;align-items:center;gap:12px}
+.pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:16px}
+.pcard{display:flex;flex-direction:column;gap:12px;padding:18px;border:1px solid var(--line);border-radius:var(--r-l);background:var(--surface);box-shadow:var(--shadow-1)}
+.pcard header{display:flex;align-items:center;gap:12px}
+.pcard .tile{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;color:var(--on-accent);flex:none}
+.pcard h3{font:600 16px var(--font-body);letter-spacing:0}
+.pcard p{font-size:14px;color:var(--ink-2)}
+.pcard code{font-size:12.5px;color:var(--ink-3);display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.pcard footer{display:flex;gap:8px;margin-top:auto}
 
-        .nav-item:hover { background-color: rgba(128,128,128,0.05); }
-        .nav-item.active {
-            background-color: rgba(128,128,128,0.08);
-            font-weight: 600;
-        }
-        .nav-item.active::before {
-            content: '';
-            position: absolute;
-            left: 4px;
-            top: 12px;
-            bottom: 12px;
-            width: 3px;
-            background: var(--accent-default);
-            border-radius: 4px;
-        }
+/* overlays */
+.overlay{position:fixed;inset:0;z-index:50;background:color-mix(in srgb,var(--ink) 45%,transparent);display:flex;align-items:flex-start;justify-content:center;padding:max(8vh,16px) max(16px,env(safe-area-inset-right,0px)) max(16px,env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px));animation:fade .15s}
+.overlay[hidden]{display:none}
+.modal{width:min(560px,100%);display:flex;flex-direction:column;max-height:100%;background:var(--raised);border:1px solid var(--line-2);border-radius:var(--r-l);box-shadow:var(--shadow-2);overflow:hidden;animation:rise .18s}
+.modal-h{padding:18px 20px 4px}
+.modal-h h2{font-size:22px}
+.modal-h p{color:var(--ink-2);font-size:14px;margin-top:2px}
+.modal-b{padding:14px 20px;display:flex;flex-direction:column;gap:10px;min-height:0;overflow:auto}
+.modal-h,.modal-f,.pal .field,.pal-f{flex:none}
+.modal-f{display:flex;justify-content:flex-end;gap:8px;padding:12px 20px 18px}
+textarea{width:100%;min-height:130px;border:1px solid var(--line-2);border-radius:var(--r-m);background:var(--sunken);padding:12px;font:400 13px/1.6 var(--font-mono);resize:vertical}
+textarea:focus-visible{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 25%,transparent)}
+.pal .field{display:flex;align-items:center;gap:12px;padding:0 18px;height:56px;border-bottom:1px solid var(--line)}
+.pal input{border:0;background:transparent;height:100%;padding:0;font-size:16px;box-shadow:none}
+.pal input:focus-visible{box-shadow:none}
+.pal ul{list-style:none;margin:0;padding:8px;flex:1 1 auto;min-height:0;overflow:auto}
+.pal li{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-m);cursor:pointer;color:var(--ink-2)}
+.pal li b{font-weight:600;color:var(--ink)}
+.pal li small{margin-left:auto}
+.pal li[aria-selected="true"]{background:color-mix(in srgb,var(--accent) 13%,var(--raised))}
+.pal-f{display:flex;gap:16px;padding:10px 18px;border-top:1px solid var(--line);font-size:13px;color:var(--ink-3)}
+.toasts{position:fixed;left:0;right:0;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none;padding-inline:16px}
+.toast{display:flex;align-items:center;gap:10px;background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:var(--r-m);font-weight:500;box-shadow:var(--shadow-2);animation:rise .2s}
+.toast .ic{color:var(--syn-bin)}
+.toast.bad .ic{color:var(--danger)}
+@keyframes fade{from{opacity:0}}
+@keyframes rise{from{opacity:0;transform:translateY(8px)}}
 
-        /* --- Cards --- */
-        .tab-panel { display: none; animation: fadeUpdate 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
-        .tab-panel.active { display: block; }
+/* design system page */
+.ds{display:flex;flex-direction:column;gap:20px}
+.ds .sec-b{padding:6px 20px 20px;display:flex;flex-direction:column;gap:16px;border-top:1px solid var(--line);padding-top:18px}
+.sw-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,150px),1fr));gap:12px}
+.sw{display:flex;flex-direction:column;gap:6px;font-size:13px}
+.sw i{display:block;height:54px;border-radius:var(--r-m);border:1px solid var(--line)}
+.sw b{font-weight:600;font-size:14px}
+.sw code{color:var(--ink-3);font-size:12px}
+.grp{display:flex;flex-direction:column;gap:8px}
+.grp>h3{font:600 15px var(--font-body);letter-spacing:0;color:var(--ink-2)}
+.demo{display:flex;flex-wrap:wrap;gap:10px;align-items:center}
+.specimen{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.type-row{display:flex;flex-direction:column;gap:2px;padding:12px 0;border-top:1px solid var(--line)}
+.type-row:first-child{border-top:0}
+.shapes{display:flex;gap:16px;flex-wrap:wrap}
+.shape{width:104px;height:72px;background:var(--sunken);border:1px solid var(--line-2);display:grid;place-items:center;font:500 12px var(--font-mono);color:var(--ink-2)}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.pair .term pre{min-height:0}
+.pair .head{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+.pair .head .tile{width:36px;height:36px;border-radius:10px;background:var(--accent);color:var(--on-accent);display:grid;place-items:center}
 
-        @keyframes fadeUpdate { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-
-        .fluent-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-base);
-            border-radius: var(--radius-lg);
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: var(--shadow-card);
-        }
-
-        .card-header {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: var(--text-primary);
-        }
-        
-        /* --- Tooltips --- */
-        .help-icon {
-            color: var(--accent-default);
-            font-size: 14px;
-            margin-left: 6px;
-            cursor: help;
-            position: relative;
-            opacity: 0.8;
-            transition: opacity 0.2s;
-        }
-        .help-icon:hover { opacity: 1; }
-
-        .help-icon:hover::after {
-            content: attr(data-tip);
-            position: absolute;
-            bottom: 150%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #202020; /* Always dark for tooltips for contrast */
-            color: #ffffff;
-            padding: 8px 12px;
-            border-radius: var(--radius-sm);
-            font-size: 12px;
-            white-space: pre-wrap;
-            width: max-content;
-            max-width: 280px;
-            z-index: 9999;
-            box-shadow: var(--shadow-flyout);
-            font-weight: normal;
-            line-height: 1.4;
-            pointer-events: none;
-            text-align: left;
-            font-family: 'Segoe UI', sans-serif;
-            border: 1px solid #454545;
-        }
-        
-        /* Tooltip Arrow */
-        .help-icon:hover::before {
-            content: '';
-            position: absolute;
-            bottom: 120%;
-            left: 50%;
-            transform: translateX(-50%);
-            border: 6px solid transparent;
-            border-top-color: #202020;
-            z-index: 9999;
-            pointer-events: none;
-        }
-
-        /* --- Form Elements --- */
-        .form-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 16px 24px;
-        }
-
-        .input-group { margin-bottom: 16px; }
-        
-        .input-label {
-            display: flex;
-            align-items: center;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 6px;
-            color: var(--text-primary);
-        }
-        
-        .input-hint { font-weight: normal; color: var(--text-secondary); font-size: 12px; margin-left: auto;}
-
-        .fluent-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--border-input);
-            background: var(--bg-input);
-            color: var(--text-primary);
-            border-radius: var(--radius-md);
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 14px;
-            border-bottom: 2px solid transparent; 
-            transition: all 0.2s;
-        }
-
-        .fluent-input:hover { background: var(--bg-input-hover); border-color: var(--text-secondary); }
-        .fluent-input:focus {
-            outline: none;
-            background: var(--bg-card);
-            border-bottom-color: var(--accent-default);
-        }
-        .fluent-input:disabled {
-            background-color: var(--bg-disabled);
-            color: var(--text-disabled);
-            cursor: not-allowed;
-            border-bottom-color: transparent;
-        }
-
-        .fluent-select {
-            appearance: none;
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px top 50%;
-            background-size: 10px auto;
-            padding-right: 32px;
-            cursor: pointer;
-        }
-
-        /* --- Fluent Toggle Switch --- */
-        .toggle-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid transparent;
-            min-height: 40px;
-        }
-        .toggle-row.disabled { opacity: 0.5; pointer-events: none; }
-        
-        .toggle-label {
-            display: flex;
-            flex-direction: column;
-            font-size: 14px;
-        }
-        .toggle-desc {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin-top: 2px;
-        }
-        .chip-warning {
-            background: var(--warning-bg);
-            color: var(--warning-text);
-            font-size: 11px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            display: inline-block;
-            margin-left: 6px;
-            font-weight: 600;
-        }
-
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 44px;
-            height: 22px;
-            flex-shrink: 0;
-            margin-left: 16px;
-        }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: transparent;
-            border: 1px solid var(--text-secondary);
-            transition: .3s;
-            border-radius: 22px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 14px;
-            width: 14px;
-            left: 3px;
-            bottom: 3px;
-            background-color: var(--text-secondary);
-            transition: .3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            border-radius: 50%;
-        }
-
-        input:checked + .slider {
-            background-color: var(--accent-default);
-            border-color: var(--accent-default);
-        }
-        input:checked + .slider:before {
-            background-color: white;
-            transform: translateX(22px);
-        }
-        input:hover + .slider { border-color: var(--text-primary); }
-        input:checked:hover + .slider { background-color: var(--accent-hover); }
-
-        /* --- Footer --- */
-        .command-bar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: var(--bg-card);
-            border-top: 1px solid var(--border-base);
-            padding: 16px 24px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            z-index: 100;
-            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
-        }
-
-        .cmd-preview {
-            font-family: 'Consolas', 'Monaco', monospace;
-            font-size: 13px;
-            background: var(--bg-app);
-            padding: 12px;
-            border-radius: var(--radius-md);
-            color: var(--text-primary);
-            border: 1px solid var(--border-input);
-            word-break: break-all;
-            max-height: 80px;
-            overflow-y: auto;
-            user-select: text;
-        }
-
-        .action-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn-group { display: flex; gap: 10px; }
-
-        .btn {
-            font-family: inherit;
-            font-size: 14px;
-            font-weight: 500;
-            padding: 8px 20px;
-            border-radius: var(--radius-md);
-            cursor: pointer;
-            border: 1px solid transparent;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
-
-        .btn-primary { background-color: var(--accent-default); color: var(--accent-text); }
-        .btn-primary:hover { background-color: var(--accent-hover); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-        
-        .btn-secondary { background-color: var(--bg-card); color: var(--text-primary); border-color: var(--border-base); }
-        .btn-secondary:hover { background-color: var(--bg-app); border-color: var(--border-input); }
-        
-        .btn-danger { background-color: transparent; color: var(--danger); }
-        .btn-danger:hover { background-color: rgba(196, 43, 28, 0.05); }
-
-        /* --- Toast Notification --- */
-        .toast {
-            position: fixed;
-            bottom: 110px;
-            right: 24px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-base);
-            padding: 12px 16px;
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-flyout);
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            transform: translateY(20px);
-            opacity: 0;
-            pointer-events: none;
-            transition: all 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-            z-index: 1000;
-            font-size: 14px;
-        }
-        .toast.show { transform: translateY(0); opacity: 1; }
-        .toast i { color: var(--success); font-size: 16px; }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .app-container { flex-direction: column; overflow-y: auto; }
-            .sidebar { width: 100%; border-right: none; border-bottom: 1px solid var(--border-base); flex-direction: row; overflow-x: auto; white-space: nowrap; padding: 10px; }
-            .content-area { padding-bottom: 150px; }
-            .nav-item { display: inline-flex; width: auto; padding: 6px 12px; }
-            .command-bar { padding: 12px; }
-            .action-row { flex-direction: column; gap: 10px; align-items: stretch; }
-            .btn { justify-content: center; }
-        }
-    </style>
+@media (max-width:1100px){
+  .builder,.two{grid-template-columns:minmax(0,1fr)}
+  .side{position:static;max-height:none;overflow:visible}
+}
+@media (max-width:899px){
+  .app{grid-template-columns:minmax(0,1fr)}
+  .rail{position:static;height:auto;flex-direction:row;align-items:center;gap:6px;padding:10px max(12px,env(safe-area-inset-right,0px)) 10px max(12px,env(safe-area-inset-left,0px));border-right:0;border-bottom:1px solid var(--line);overflow-x:auto}
+  .rail-group{flex-direction:row;gap:4px}
+  .rail-group>span,.rail-foot,.brand b{display:none}
+  .nav{white-space:nowrap}
+  .nav .tile{display:none}
+  .topbar{position:static}
+  .crumb{display:none}
+  .search{margin-left:0;width:100%}
+}
+@media (max-width:640px){
+  .modes{grid-template-columns:minmax(0,1fr)}
+  .row.in{grid-template-columns:minmax(0,1fr)}
+  .item{grid-template-columns:34px minmax(0,1fr)}
+  .item .n{display:none}
+  .item .a{grid-column:1/-1;justify-content:flex-end}
+  .mhead h1,.page-h h1{font-size:28px}
+  .explain li{grid-template-columns:minmax(0,1fr)}
+}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+</style>
 </head>
-<body data-theme="light">
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-conduit" viewBox="0 0 24 24"><path d="M4 7h9a3.5 3.5 0 0 1 0 7H8a3.5 3.5 0 0 0 0 7h12"/></symbol>
+  <symbol id="i-mirror" viewBox="0 0 24 24"><path d="M12 3v18"/><path d="M8 7l-5 5 5 5"/><path d="M16 7l5 5-5 5"/></symbol>
+  <symbol id="i-fetch" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="M7 10l5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9l-.8-1.2A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/></symbol>
+  <symbol id="i-globe" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2"/><path d="M4 16a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="M12 5v14"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+  <symbol id="i-moon" viewBox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m5 12 7-7 7 7"/><path d="M12 19V5"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="M12 5v14"/><path d="m19 12-7 7-7-7"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="m21.7 18-8-14a2 2 0 0 0-3.4 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.7-3Z"/><path d="M12 9v4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M20 13c0 5-3.5 7.5-7.7 8.9a1 1 0 0 1-.6 0C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.500-1.200 6.200-2.700a1.200 1.200 0 0 1 1.500 0C14.500 3.800 17 5 19 5a1 1 0 0 1 1 1z"/></symbol>
+  <symbol id="i-swap" viewBox="0 0 24 24"><path d="m16 3 4 4-4 4"/><path d="M20 7H4"/><path d="m8 21-4-4 4-4"/><path d="M4 17h16"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/></symbol>
+  <symbol id="i-terminal" viewBox="0 0 24 24"><path d="m4 17 6-6-6-6"/><path d="M12 19h8"/></symbol>
+  <symbol id="i-bookmark" viewBox="0 0 24 24"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.500 20.500 2 22l1.500-5.500Z"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></symbol>
+  <symbol id="i-eye" viewBox="0 0 24 24"><path d="M2 12s3.500-7 10-7 10 7 10 7-3.500 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></symbol>
+  <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></symbol>
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></symbol>
+  <symbol id="i-ext" viewBox="0 0 24 24"><path d="M7 17 17 7"/><path d="M7 7h10v10"/></symbol>
+  <symbol id="i-import" viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m8 11 4 4 4-4"/><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/></symbol>
+</svg>
 
-    <header class="app-header">
-        <div class="app-title">
-            <i class="fa-solid fa-copy"></i>
-            RoboGUI Ultimate
+<div class="app" id="app" data-module="mirror">
+  <aside class="rail">
+    <a class="brand" href="#mirror" aria-label="Conduit home">
+      <span class="brand-mark"><svg class="ic"><use href="#i-conduit"/></svg></span><b>Conduit</b>
+    </a>
+    <nav class="rail-group" aria-label="Tools">
+      <span>Tools</span>
+      <a class="nav" href="#mirror" data-r="mirror"><span class="tile m"><svg class="ic"><use href="#i-mirror"/></svg></span>Mirror</a>
+      <a class="nav" href="https://ar-puuk.github.io/wget-gui/" rel="noopener"><span class="tile f"><svg class="ic"><use href="#i-fetch"/></svg></span>Fetch<svg class="ic" style="margin-left:auto;width:14px;height:14px"><use href="#i-ext"/></svg></a>
+    </nav>
+    <nav class="rail-group" aria-label="Workspace">
+      <span>Workspace</span>
+      <a class="nav" href="#queue" data-r="queue"><svg class="ic"><use href="#i-list"/></svg>Queue<b class="count" id="qcount" hidden>0</b></a>
+      <a class="nav" href="#profiles" data-r="profiles"><svg class="ic"><use href="#i-bookmark"/></svg>Profiles</a>
+    </nav>
+    
+    <div class="rail-foot"><svg class="ic"><use href="#i-shield"/></svg><span>Everything runs in your browser. Nothing is uploaded.</span></div>
+  </aside>
+  <div class="main">
+    <header class="topbar"><div class="bar">
+      <div class="crumb" id="crumb"></div>
+      <button class="search" id="open-pal" type="button" aria-label="Open command palette"><svg class="ic"><use href="#i-search"/></svg><span>Search options, presets, actions</span><kbd>Ctrl K</kbd></button>
+      <button class="btn icon ghost" id="theme" type="button" aria-label="Switch theme"><svg class="ic"><use id="theme-ic" href="#i-moon"/></svg></button>
+    </div></header>
+    <main class="wrap" id="view"></main>
+  </div>
+</div>
+
+<div class="overlay pal" id="pal" hidden>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Command palette">
+    <div class="field"><svg class="ic"><use href="#i-search"/></svg><input id="pal-in" type="text" placeholder="Type to search" autocomplete="off" spellcheck="false" aria-label="Search"></div>
+    <ul id="pal-list" role="listbox"></ul>
+    <div class="pal-f"><span><kbd>Up</kbd> <kbd>Down</kbd> move</span><span><kbd>Enter</kbd> run</span><span><kbd>Esc</kbd> close</span></div>
+  </div>
+</div>
+<div class="overlay" id="modal" hidden><div class="modal" role="dialog" aria-modal="true" id="modal-box"></div></div>
+<div class="toasts" id="toasts" aria-live="polite"></div>
+<script>
+(function(){
+'use strict';
+const APP='mirror',OTHER={"key":"fetch","name":"Fetch","bin":"wget","tile":"f","icon":"fetch","url":"https://ar-puuk.github.io/wget-gui/"};
+const $=(s,r=document)=>r.querySelector(s), $$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const q=s=>/\s/.test(s)?`"${s}"`:s;
+const ic=(n,c)=>`<svg class="ic${c?' '+c:''}"><use href="#i-${n}"/></svg>`;
+
+/* ------------------------------------------------------------------ tool definitions */
+const H=label=>({t:'head',label});
+const G=(id,label,help,flag,x)=>({t:'toggle',id,label,help,flag,...x});
+const T=(id,label,help,flag,style,ph,x)=>({t:'text',id,label,help,flag,style,ph,...x});
+const A=(id,label,help,flag,ph,x)=>({t:'area',id,label,help,flag,style:'rep',ph,...x});
+const O=(v,label,flag,desc,x)=>({v,label,flag,desc:desc||label,...x});
+const SEL=(id,label,help,options,x)=>({t:'sel',id,label,help,options,...x});
+const CHK=(id,label,help,flag,dflt,options,x)=>({t:'chk',id,label,help,flag,dflt,options,...x});
+const ATTR=[['R','Read-only'],['A','Archive'],['S','System'],['H','Hidden'],['C','Compressed'],['N','Not indexed'],['E','Encrypted'],['T','Temporary']].map(a=>({v:a[0],label:a[1]}));
+const ATTRO=ATTR.concat([{v:'O',label:'Offline'}]);
+const SECRET={risk:'caution',note:'A password typed here appears in the command text and in your shell history.'};
+
+const MODULES={
+mirror:{
+  key:'mirror',name:'Mirror',bin:'robocopy',icon:'mirror',tile:'m',ci:true,flagChar:'/',
+  tagline:'Build a Robocopy command for backups, syncs and moves. It updates as you choose.',
+  dryId:'dry',
+  find:'Find an option, such as retry or /MT',
+  sections:[
+   {id:'loc',title:'Locations',desc:'Where files come from and where they go.',fields:[
+     {t:'path',id:'src',keep:1,label:'Source folder',ph:'D:\\Projects',icon:'folder'},
+     {t:'path',id:'dst',keep:1,label:'Destination folder',ph:'\\\\server\\share\\backup',icon:'folder'},
+     T('inc','Only these files','Leave empty to copy everything. Wildcards such as *.docx work.',null,'pos','*.docx *.xlsx')]},
+   {id:'beh',title:'What to do',desc:'How files are copied and what happens to the rest.',fields:[
+     {t:'seg',id:'mode',options:[
+       O('copy','Copy','','Add new and changed files. Nothing is removed.'),
+       O('mirror','Mirror','/MIR','Make the destination identical to the source.',{risk:'danger',tag:'Deletes in destination',note:'Mirror deletes files in the destination that are not in the source.'}),
+       O('move','Move','/MOVE','Copy files and folders, then remove them from the source.',{risk:'caution',tag:'Deletes in source',note:'Move removes source files and folders once they are copied.'}),
+       O('movef','Move files only','/MOV','Copy files, then remove the files but keep the folders in the source.',{risk:'caution',tag:'Deletes in source',note:'Move removes source files once they are copied.'})]},
+     H('Subfolders'),
+     SEL('subs','Include subfolders','Choose how deep the copy goes.',[O('none','Top folder only',''),O('s','Subfolders, skipping empty ones','/S','Copies subfolders that contain files.'),O('e','Subfolders, including empty ones','/E','Copies every subfolder, even empty ones.')],{off:v=>v.mode==='mirror'?'Mirror always includes subfolders':''}),
+     T('lev','Limit folder depth','Only copy this many levels of the folder tree.','/LEV','colon','3'),
+     H('When a file already exists'),
+     G('xo','Keep newer destination files','Do not replace a destination file that is newer than the source.','/XO'),
+     G('xn','Skip files updated at the source','Do not copy files that are newer in the source than in the destination.','/XN'),
+     G('xc','Skip changed files','Skip files with the same time but a different size.','/XC',{adv:1}),
+     G('is','Copy identical files too','Include files that look the same, so everything is rewritten.','/IS',{adv:1}),
+     G('it','Include tweaked files','Include files whose attributes differ but data is the same.','/IT',{adv:1}),
+     G('im','Include modified files','Include files whose change time differs but data is the same.','/IM',{adv:1}),
+     G('xl','Skip files only in the source','Do not copy files that do not exist at the destination yet.','/XL',{adv:1}),
+     G('xx','Leave extra destination files alone','Do not delete or report files that exist only at the destination.','/XX',{adv:1}),
+     H('Clean up'),
+     G('purge','Delete what is gone from the source','Removes destination files and folders that no longer exist in the source.','/PURGE',{risk:'danger',note:'Purge deletes destination files that are not in the source.',off:v=>v.mode==='mirror'?'Already part of Mirror':''}),
+     G('dry','Preview only','Lists what would happen without changing any file.','/L')]},
+   {id:'fil',title:'Filters',desc:'Leave things out.',fields:[
+     H('Folders and files to skip'),
+     T('xd','Skip folders','Names or paths, separated by spaces.','/XD','list','node_modules .git'),
+     T('xf','Skip files','Names or wildcards, separated by spaces.','/XF','list','*.tmp thumbs.db'),
+     H('By size'),
+     T('max','Skip files bigger than','Bytes. For example 10485760 is 10 MB.','/MAX','colon','10485760'),
+     T('min','Skip files smaller than','Bytes.','/MIN','colon','1024'),
+     H('By age'),
+     T('minage','Skip files newer than','Days, or a date as YYYYMMDD.','/MINAGE','colon','7'),
+     T('maxage','Skip files older than','Days, or a date as YYYYMMDD.','/MAXAGE','colon','365'),
+     T('minlad','Skip files used since','Last access date. Days, or YYYYMMDD.','/MINLAD','colon','7',{adv:1}),
+     T('maxlad','Skip files not used since','Last access date. Days, or YYYYMMDD.','/MAXLAD','colon','365',{adv:1}),
+     H('By attribute'),
+     G('arch','Only files marked for backup','Copies only files with the archive attribute set.','/A'),
+     G('archm','Only marked files, then clear the mark','Copies files with the archive attribute and resets it.','/M',{adv:1}),
+     CHK('ia','Only files with any of these attributes','Tick the attributes to include.','/IA','',ATTRO,{adv:1}),
+     CHK('xa','Skip files with any of these attributes','Tick the attributes to exclude.','/XA','',ATTRO),
+     H('Links'),
+     G('xj','Skip all links and junctions','Excludes symbolic links and junction points.','/XJ'),
+     G('xjd','Skip folder links and junctions','Excludes symbolic links for folders and junction points.','/XJD',{adv:1}),
+     G('xjf','Skip file links','Excludes symbolic links for files.','/XJF',{adv:1}),
+     G('sj','Copy junctions as junctions','Does not follow junction points into their targets.','/SJ',{adv:1}),
+     G('sl','Copy symbolic links as links','Does not follow symbolic links into their targets.','/SL',{adv:1})]},
+   {id:'pre',title:'Preserve',desc:'What travels with each file and folder.',fields:[
+     H('File details'),
+     CHK('copy','Copy these file details','Data, attributes and timestamps are the default.','/COPY','DAT',[{v:'D',label:'Data'},{v:'A',label:'Attributes'},{v:'T',label:'Timestamps'},{v:'X',label:'Skip alternate streams'},{v:'S',label:'Permissions'},{v:'O',label:'Owner'},{v:'U',label:'Auditing'}].sort((a,b)=>'DATXSOU'.indexOf(a.v)-'DATXSOU'.indexOf(b.v))),
+     G('sec','Include permissions','Same as Data, Attributes, Timestamps and Permissions.','/SEC'),
+     G('copyall','Copy everything','Data, attributes, timestamps, permissions, owner and auditing.','/COPYALL'),
+     G('nocopy','Copy no file details','Useful together with Delete what is gone from the source.','/NOCOPY',{adv:1}),
+     G('secfix','Repair permissions on every file','Also fixes files that were skipped as up to date.','/SECFIX',{adv:1}),
+     G('timfix','Repair times on every file','Also fixes files that were skipped as up to date.','/TIMFIX',{adv:1}),
+     CHK('aplus','Add these attributes to copies','Tick the attributes to set on every copied file.','/A+','',ATTR.filter(a=>a.v!=='O'),{adv:1}),
+     CHK('aminus','Remove these attributes from copies','Tick the attributes to clear on every copied file.','/A-','',ATTRO,{adv:1}),
+     G('efsraw','Copy encrypted files in raw mode','Copies EFS encrypted files without decrypting them.','/EFSRAW',{adv:1}),
+     SEL('sparse','Sparse files','Keep or drop the sparse state of files.',[O('','Default',''),O('y','Keep sparse state','/SPARSE:Y','Retains the sparse state of files.'),O('n','Do not keep sparse state','/SPARSE:N','Writes sparse files as full files.')],{adv:1}),
+     H('Folder details'),
+     CHK('dcopy','Copy these folder details','Data and attributes are the default.','/DCOPY','DA',[{v:'D',label:'Data'},{v:'A',label:'Attributes'},{v:'T',label:'Timestamps'},{v:'E',label:'Extended attributes'},{v:'X',label:'Skip alternate streams'}],{adv:1}),
+     G('nodcopy','Copy no folder details','Skips the default folder data and attributes.','/NODCOPY',{adv:1})]},
+   {id:'perf',title:'Performance',desc:'Tune for local disks, networks or flaky shares.',fields:[
+     H('Speed'),
+     T('threads','Copy threads','Files copied at the same time, from 1 to 128.','/MT','colon','16'),
+     G('unbuf','Unbuffered copy','Faster for very large files.','/J'),
+     T('ipg','Pause between packets','Milliseconds, to free bandwidth on slow lines. Cannot be combined with threads.','/IPG','colon','50',{adv:1}),
+     G('nooffload','Do not use copy offload','Copies without the Windows copy offload mechanism.','/NOOFFLOAD',{adv:1}),
+     G('compress','Compress over the network','Requests SMB compression when the link supports it.','/COMPRESS',{adv:1}),
+     G('noclone','Do not use block cloning','Skips the block cloning optimisation.','/NOCLONE',{adv:1}),
+     T('iomax','Largest I/O request','Throttling. Size such as 4M. Setting it turns throttling on.','/IoMaxSize','colon','4M',{adv:1}),
+     T('iorate','Throttle to a rate','Bytes per second such as 50M. Setting it turns throttling on.','/IoRate','colon','50M',{adv:1}),
+     T('threshold','Throttle only above a size','Files smaller than this are not throttled. Such as 1G.','/Threshold','colon','1G',{adv:1}),
+     H('Reliability'),
+     T('retries','Retries','Attempts on a failed file. The default is a million.','/R','colon','3'),
+     T('wait','Seconds between retries','The default is 30 seconds.','/W','colon','5'),
+     G('restartable','Resume interrupted copies','Restartable mode. Slower, but safer on unstable links.','/Z'),
+     G('backup','Backup mode','Reads files you lack permission for. Needs admin rights.','/B'),
+     G('zb','Restartable, then backup mode','Falls back to backup mode if access is denied.','/ZB',{adv:1}),
+     G('reg','Save retry settings as defaults','Stores Retries and Seconds between retries in the registry.','/REG',{adv:1}),
+     G('tbd','Wait for share names','Retries when a share name is not defined yet.','/TBD',{adv:1}),
+     T('lfsm','Pause when disk is nearly full','Low free space mode. Floor size such as 500MB.','/LFSM','colon','500MB',{adv:1}),
+     H('Timestamps'),
+     G('fft','NAS-friendly timestamps','Allows a 2 second difference, for FAT and many NAS boxes.','/FFT'),
+     G('dstshift','Ignore daylight saving shifts','Compensates for one hour time differences.','/DST',{adv:1})]},
+   {id:'aut',title:'Automation',desc:'Run on a schedule, keep watching, or reuse job files.',fields:[
+     H('Keep watching'),
+     T('mon','Run again after this many changes','Watches the source and repeats.','/MON','colon','10'),
+     T('mot','Run again after this many minutes','Repeats if something changed.','/MOT','colon','15'),
+     T('rh','Only copy during these hours','24 hour times as hhmm-hhmm.','/RH','colon','0100-0600'),
+     G('pf','Check the hours for each file','Otherwise the hours are checked once per pass.','/PF',{adv:1}),
+     H('Job files'),
+     T('job','Load options from a job file','Name of a saved job.','/JOB','colon','nightly'),
+     T('save','Save these options as a job file','Name of the job file to write.','/SAVE','colon','nightly'),
+     G('quit','Show the options and stop','Quits after reading the command line.','/QUIT',{adv:1}),
+     G('nosd','No source folder given','Use with job files that hold the source.','/NOSD',{adv:1}),
+     G('nodd','No destination folder given','Use with job files that hold the destination.','/NODD',{adv:1})]},
+   {id:'log',title:'Logging',desc:'Keep a record of what happened.',fields:[
+     H('Log file'),
+     T('log','Write a log file','Overwrites the file each run.','/LOG','colon','D:\\Logs\\job.log'),
+     T('logplus','Append to a log file','Adds to the end of an existing log.','/LOG+','colon','D:\\Logs\\job.log'),
+     T('unilog','Write a Unicode log file','Overwrites the file each run.','/UNILOG','colon','D:\\Logs\\job.log',{adv:1}),
+     T('uniplus','Append to a Unicode log file','Adds to the end of an existing log.','/UNILOG+','colon','D:\\Logs\\job.log',{adv:1}),
+     G('tee','Also show in the console','Prints to the screen as well as the log.','/TEE'),
+     G('unicode','Console output as Unicode','Writes status to the console as Unicode.','/UNICODE',{adv:1}),
+     H('What to show'),
+     G('v','Show skipped files','Verbose output.','/V'),
+     G('x','Report every extra file','Not only the selected ones.','/X',{adv:1}),
+     G('ts','Include source timestamps','Adds file times to the output.','/TS',{adv:1}),
+     G('fp','Include full paths','Shows the whole path of each file.','/FP',{adv:1}),
+     G('bytes','Sizes in bytes','Instead of KB, MB and GB.','/BYTES',{adv:1}),
+     G('eta','Show estimated finish time','For each copied file.','/ETA',{adv:1}),
+     H('What to hide'),
+     G('np','Hide percent progress','Keeps the log readable.','/NP'),
+     G('njh','Hide the job header','Removes the banner and option summary.','/NJH'),
+     G('njs','Hide the job summary','Removes the totals at the end.','/NJS'),
+     G('nfl','Hide file names','Do not list files.','/NFL',{adv:1}),
+     G('ndl','Hide folder names','Do not list folders.','/NDL',{adv:1}),
+     G('ns','Hide file sizes','Do not log sizes.','/NS',{adv:1}),
+     G('nc','Hide file classes','Do not log the class of each file.','/NC',{adv:1})]},
+   {id:'adv',title:'Advanced',desc:'Older file systems, special cases and anything not covered.',fields:[
+     H('Older file systems'),
+     G('fat','Use 8.3 file names','Creates destination files with short FAT names only.','/FAT',{adv:1}),
+     G('f256','Turn off long path support','Paths over 256 characters will fail.','/256',{adv:1}),
+     H('Folder tree only'),
+     G('create','Create the tree and empty files','Makes folders and zero length files, no data.','/CREATE',{adv:1}),
+     H('Include these files'),
+     T('inclist','Include the following files','Names or wildcards, separated by spaces.','/IF','list','*.pdf',{adv:1}),
+     H('Anything else'),
+     T('extra','Extra flags','Added to the end exactly as typed.',null,'raw','/XJ /DCOPY:T')]}],
+  presets:[
+   {name:'Daily backup',icon:'shield',set:{mode:'copy',subs:'e',xo:true,threads:'16',retries:'3',wait:'5',restartable:true,fft:true,np:true,log:'%USERPROFILE%\\Documents\\backup.log'}},
+   {name:'Exact mirror',icon:'mirror',set:{mode:'mirror',threads:'32',retries:'2',wait:'3',fft:true,np:true,tee:true}},
+   {name:'Archive with permissions',icon:'folder',set:{mode:'copy',subs:'e',copyall:true,dcopy:'DAT',restartable:true,retries:'3',wait:'5',log:'%USERPROFILE%\\Documents\\archive.log'}},
+   {name:'Fast LAN copy',icon:'bolt',set:{mode:'copy',subs:'e',threads:'64',retries:'1',wait:'1',np:true}},
+   {name:'Move and clean up',icon:'folder',set:{mode:'move',subs:'e',dry:true,retries:'3',wait:'5',log:'%USERPROFILE%\\Documents\\move.log'}}],
+  defaults:{mode:'copy',subs:'e',retries:'3',wait:'5'},
+  need(v){const a=[];if(!v.job){if(!String(v.src||'').trim()&&!v.nosd)a.push('a source folder');if(!String(v.dst||'').trim()&&!v.nodd)a.push('a destination folder')}return a},
+  head(v){const t=[{t:'bin',v:'robocopy'}];if(String(v.src||'').trim())t.push({t:'path',v:`"${v.src}"`});if(String(v.dst||'').trim())t.push({t:'path',v:`"${v.dst}"`});String(v.inc||'').trim().split(/\s+/).filter(Boolean).forEach(x=>t.push({t:'val',v:x}));return t},
+  tail(){return []},
+  advice(v){const a=[];
+    if(v.mode==='mirror'&&!v.dry)a.push({risk:'info',text:'Run it once with Preview only to check what would be deleted.'});
+    if(+v.threads>0&&(v.ipg||v.efsraw))a.push({risk:'caution',text:'Copy threads cannot be combined with a packet pause or raw EFS copying.'});
+    if(v.mode==='mirror'&&v.xx)a.push({risk:'info',text:'Leaving extra files alone means Mirror will not delete them.'});
+    if(v.mode==='mirror'&&v.purge)a.push({risk:'info',text:'Mirror already includes the purge.'});
+    if((v.copyall||v.sec)&&v.copy&&v.copy!=='DAT')a.push({risk:'info',text:'Copy everything and Include permissions override the file details you ticked.'});
+    return a},
+  summary(v){const b=p=>String(p||'').replace(/[\\/]+$/,'').split(/[\\/]/).pop()||p;return `${b(v.src)||'Source'} to ${b(v.dst)||'destination'}`}
+}};
+
+/* ------------------------------------------------------------------ engine */
+const fieldsOf=m=>m.sections.flatMap(s=>s.fields);
+function blank(m){const v={};fieldsOf(m).forEach(f=>{if(f.t==='head')return;v[f.id]=f.t==='toggle'?false:(f.t==='seg'||f.t==='sel')?f.options[0].v:f.t==='chk'?(f.dflt||''):''});return v}
+function emit(m,v){
+  const items=[];
+  for(const f of fieldsOf(m)){
+    if(f.t==='head'||(f.off&&f.off(v)))continue;
+    const val=v[f.id],base={desc:f.help,risk:f.risk,note:f.note};
+    if(f.t==='toggle'){if(val)items.push({...base,tok:[{t:'flag',v:f.flag}]});}
+    else if(f.t==='seg'||f.t==='sel'){const o=f.options.find(o=>o.v===val);if(o&&o.flag)items.push({desc:o.desc,risk:o.risk,note:o.note,tok:o.flag.split(' ').map(x=>({t:'flag',v:x}))});}
+    else if(f.t==='chk'){const s=String(val||'');if(s&&s!==(f.dflt||''))items.push({...base,tok:[{t:'flag',v:f.flag+':'},{t:'val',v:s,glue:1}]});}
+    else if(f.t==='area'){String(val||'').split(/\n/).map(x=>x.trim()).filter(Boolean).forEach(line=>items.push({...base,tok:[{t:'flag',v:f.flag+'='},{t:'val',v:q(line),glue:1}]}));}
+    else{
+      const s=String(val||'').trim();
+      if(!s||f.style==='pos'||(f.t==='path'&&!f.flag))continue;
+      let tok;
+      if(f.style==='colon')tok=[{t:'flag',v:f.flag+':'},{t:'val',v:q(s),glue:1}];
+      else if(f.style==='eq')tok=[{t:'flag',v:f.flag+'='},{t:'val',v:q(s),glue:1}];
+      else if(f.style==='space')tok=[{t:'flag',v:f.flag},{t:'val',v:q(s)}];
+      else if(f.style==='list')tok=[{t:'flag',v:f.flag},...s.split(/\s+/).map(x=>({t:'val',v:x}))];
+      else tok=s.split(/\s+/).map(x=>({t:'flag',v:x}));
+      items.push({...base,tok});
+    }
+  }
+  return items;
+}
+const gstr=g=>g.map((t,i)=>(i&&!t.glue?' ':'')+t.v).join('');
+const ghtml=g=>g.map((t,i)=>(i&&!t.glue?' ':'')+`<span class="t-${t.t}">${esc(t.v)}</span>`).join('');
+function compute(key,multi){
+  const m=MODULES[key],v=S[key],items=emit(m,v);
+  const head=m.head(v),tail=m.tail(v);
+  const groups=[head,...items.map(i=>i.tok)];if(tail.length)groups.push(tail);
+  const text=groups.map(gstr).join(multi?' ^\n  ':' ');
+  const html=groups.map(ghtml).join(multi?' <span class="t-dim">^</span>\n  ':' ');
+  const miss=m.need(v);
+  const notes=[];items.forEach(i=>{if(i.risk&&i.note)notes.push({risk:i.risk,text:i.note})});
+  m.advice(v).forEach(a=>notes.push(a));
+  const level=notes.some(n=>n.risk==='danger')?'danger':notes.some(n=>n.risk==='caution')?'caution':'safe';
+  return {text,html,items,notes,level,miss,flat:groups.map(gstr).join(' ')};
+}
+
+/* parser: paste an existing command, fill the form */
+function parseCmd(key,text){
+  const m=MODULES[key],v=blank(m),pre=m.flagChar,norm=s=>m.ci?s.toUpperCase():s;
+  const toks=[...text.replace(/\^\s*\r?\n/g,' ').matchAll(/(?:[^\s"]+|"[^"]*")+/g)].map(x=>x[0].replace(/"/g,''));
+  if(toks[0]&&/^(robocopy|wget)(\.exe)?$/i.test(toks[0]))toks.shift();
+  const look=new Map();
+  fieldsOf(m).forEach(f=>{
+    if(f.t==='head')return;
+    if(f.t==='toggle'){[f.flag,...(f.alias||[])].forEach(x=>look.set(norm(x),{f}))}
+    else if(f.t==='seg'||f.t==='sel'){f.options.forEach(o=>{if(o.flag&&!o.flag.includes(' '))look.set(norm(o.flag),{f,o})})}
+    else if(f.flag&&f.style!=='pos'&&f.style!=='raw'){[f.flag,...(f.alias||[])].forEach(x=>look.set(norm(x),{f}))}
+  });
+  const setVal=(f,val)=>{
+    if(f.t==='chk'){const u=val.toUpperCase();v[f.id]=f.options.map(o=>o.v).filter(l=>u.includes(l)).join('')}
+    else if(f.style==='rep')v[f.id]=(v[f.id]?v[f.id]+'\n':'')+val;
+    else v[f.id]=val;
+  };
+  const pos=[],extra=[];
+  for(let i=0;i<toks.length;i++){
+    const tk=toks[i];
+    if(!tk.startsWith(pre)){pos.push(tk);continue}
+    const h=look.get(norm(tk));
+    if(h){
+      if(h.f.t==='toggle')v[h.f.id]=true;
+      else if(h.o)v[h.f.id]=h.o.v;
+      else if(h.f.style==='list'){const l=[];while(i+1<toks.length&&!toks[i+1].startsWith(pre))l.push(toks[++i]);v[h.f.id]=l.join(' ')}
+      else if(h.f.t==='chk'||(m.ci&&h.f.style==='colon')){/* bare flag, nothing to read */}
+      else if(i+1<toks.length)setVal(h.f,toks[++i]);
+      continue;
+    }
+    const mm=tk.match(/^([^:=]+)[:=](.*)$/);
+    const h2=mm&&look.get(norm(mm[1]));
+    if(h2&&h2.f&&!h2.o&&['text','path','chk','area'].includes(h2.f.t)){setVal(h2.f,mm[2]);continue}
+    extra.push(tk);
+  }
+  if(key==='mirror'){v.src=pos[0]||'';v.dst=pos[1]||'';v.inc=pos.slice(2).join(' ')}
+  else v.url=pos[pos.length-1]||'';
+  v.extra=extra.join(' ');
+  return {v,unknown:extra.length};
+}
+
+/* ------------------------------------------------------------------ state */
+const S={};Object.keys(MODULES).forEach(k=>{S[k]={...blank(MODULES[k]),...MODULES[k].defaults}});
+const TAB={};
+function isSet(f,x){
+  if(f.t==='head')return false;
+  if(f.t==='toggle')return !!x;
+  if(f.t==='chk')return String(x||'')!==(f.dflt||'');
+  if(f.t==='seg'||f.t==='sel'){const o=f.options.find(o=>o.v===x);return !!(o&&o.flag)}
+  return String(x==null?'':x).trim()!=='';
+}
+function paintSteps(){
+  const f=$('#prog-f');if(!f)return;
+  const m=MODULES[cur],ids=m.sections.map(s=>s.id),id=ids.includes(TAB[cur])?TAB[cur]:ids[0],i=ids.indexOf(id),N=ids.length;
+  const v=S[cur],app=fieldsOf(m).filter(x=>x.t!=='head'&&!(x.off&&x.off(v))&&(!x.adv||showAdv||isSet(x,v[x.id])));
+  const n=app.filter(x=>isSet(x,v[x.id])).length,T=app.length,miss=compute(cur,false).miss;
+  f.style.transform=`scaleX(${T?n/T:0})`;
+  $('#prog-l').textContent=`${n} of ${T} options filled`;
+  const r=$('#prog-r');r.textContent=miss.length?`Still needed: ${miss.join(' and ')}`:'Required fields done';
+  r.style.color=miss.length?'var(--warn)':'var(--ok)';
+  $('#prog').setAttribute('aria-valuenow',T?Math.round(n/T*100):0);
+  const b=$('#s-back'),x=$('#s-next');
+  b.disabled=i===0;
+  if(i<N-1){x.dataset.step='1';delete x.dataset.act;x.innerHTML=`Next: ${esc(m.sections[i+1].title)}${ic('right')}`}
+  else{delete x.dataset.step;x.dataset.act='add';x.innerHTML=ic('plus')+'Add to queue'}
+}
+let showAdv=false;
+function applyFilter(){
+  const key=cur,m=MODULES[key],box=$('#find');if(!box)return;
+  const qs=box.value.trim().toLowerCase().split(/\s+/).filter(Boolean),v=S[key],searching=qs.length>0;
+  const ids=m.sections.map(s=>s.id),tabId=ids.includes(TAB[key])?TAB[key]:ids[0];
+  const byId={};fieldsOf(m).forEach(f=>{if(f.t!=='head')byId[f.id]=f});
+  let any=false;
+  m.sections.forEach(s=>{
+    const sec=$('#s-'+s.id);if(!sec)return;
+    let shown=0,head=null;
+    $$('.row[data-row]',sec).forEach(row=>{
+      if(row.dataset.head){row.hidden=true;head=row;return}
+      const f=byId[row.dataset.row];
+      const vis=searching?qs.every(w=>{const st=w.length>3?w.replace(/(ies|ing|ed|es|s|y)$/,""):w;return row.dataset.s.includes(st)}):(!f.adv||showAdv||isSet(f,v[f.id]));
+      row.hidden=!vis;
+      if(vis){shown++;if(head&&!searching)head.hidden=false}
+    });
+    sec.hidden=searching?shown===0:s.id!==tabId;
+    if(shown)any=true;
+  });
+  $('.tabs').hidden=searching;$('.stepnav').hidden=searching;$('.prog').hidden=searching;
+  $('#find-empty').hidden=!(searching&&!any);
+}
+function tabFade(){const t=$('.tabs');if(!t)return;t.classList.toggle('more',t.scrollWidth-t.clientWidth-t.scrollLeft>4)}
+function setTab(id,focus){
+  const m=MODULES[cur];if(!m.sections.some(s=>s.id===id))return;
+  TAB[cur]=id;paintSteps();
+  $$('[data-tab]').forEach(b=>{const on=b.dataset.tab===id;b.setAttribute('aria-selected',on);b.tabIndex=on?0:-1;if(on&&focus)b.focus();b.scrollIntoView&&on&&b.scrollIntoView({block:'nearest',inline:'nearest'})});
+  applyFilter();tabFade();
+}
+let multi=false,fmt='bat',stopOnFail=true,cur=APP,page=APP;
+let queue=[],uid=1;
+const KEY='conduit.'+APP;
+let profiles=[];
+(function(){
+  try{
+    const st=JSON.parse(localStorage.getItem(KEY+'.state')||'null');
+    if(st){
+      if(st.v)S[APP]={...blank(MODULES[APP]),...st.v};
+      if(Array.isArray(st.q))queue=st.q;
+      if(st.fmt==='bat'||st.fmt==='ps1')fmt=st.fmt;
+      if(typeof st.stop==='boolean')stopOnFail=st.stop;
+      if(typeof st.multi==='boolean')multi=st.multi;
+      if(typeof st.adv==='boolean')showAdv=st.adv;
+    }
+    const p=JSON.parse(localStorage.getItem(KEY+'.profiles')||'[]');
+    if(Array.isArray(p))profiles=p;
+  }catch(e){}
+  uid=1+Math.max(0,...queue.map(x=>+x.id||0),...profiles.map(p=>parseInt(String(p.id).slice(1),10)||0));
+})();
+function persist(){try{localStorage.setItem(KEY+'.state',JSON.stringify({v:S[APP],q:queue,fmt,stop:stopOnFail,multi,adv:showAdv}))}catch(e){}}
+const persistProfiles=()=>{try{localStorage.setItem(KEY+'.profiles',JSON.stringify(profiles))}catch(e){}};
+
+/* ------------------------------------------------------------------ helpers */
+function toast(msg,bad){
+  const el=document.createElement('div');el.className='toast'+(bad?' bad':'');
+  el.innerHTML=ic(bad?'warn':'check')+`<span>${esc(msg)}</span>`;
+  $('#toasts').appendChild(el);setTimeout(()=>el.remove(),2600);
+}
+async function copyText(txt,msg){
+  try{await navigator.clipboard.writeText(txt);toast(msg||'Copied')}
+  catch(e){const t=document.createElement('textarea');t.value=txt;document.body.appendChild(t);t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}t.remove();ok?toast(msg||'Copied'):toast('Copy was blocked. Select the text and copy it.',true)}
+}
+function updQ(){const c=$('#qcount');c.textContent=queue.length;c.hidden=!queue.length;persist()}
+function openModal(title,desc,body,actions){
+  const box=$('#modal-box');
+  box.innerHTML=`<div class="modal-h"><h2>${esc(title)}</h2>${desc?`<p>${esc(desc)}</p>`:''}</div><div class="modal-b">${body}</div><div class="modal-f">${actions.map((a,i)=>`<button type="button" class="btn ${a.primary?'primary':''}" data-a="${i}">${esc(a.label)}</button>`).join('')}</div>`;
+  $('#modal').hidden=false;
+  const first=$('textarea,input',box);(first||$('.btn.primary',box)).focus();
+  $$('[data-a]',box).forEach(b=>b.onclick=()=>{const r=actions[+b.dataset.a].run?actions[+b.dataset.a].run(box):true;if(r!==false)closeModal()});
+}
+function closeModal(){$('#modal').hidden=true}
+$('#modal').addEventListener('mousedown',e=>{if(e.target.id==='modal')closeModal()});
+
+/* ------------------------------------------------------------------ builder */
+function fieldHTML(f,v,idx){
+  if(f.t==='head')return `<div class="row head" data-row="h${idx}" data-head="1"><h4>${esc(f.label)}</h4></div>`;
+  const id='f-'+f.id,flagTag=f.flag&&f.t!=='seg'?`<code class="flag">${esc(f.flag)}</code>`:'';
+  const s=esc([f.label,f.help,f.flag,...(f.alias||[]),...(f.options||[]).map(o=>o.label+' '+(o.flag||''))].filter(Boolean).join(' ').toLowerCase());
+  const at=`data-row="${f.id}" data-s="${s}"`,adv=f.adv?' adv':'';
+  const head=`<div class="lbl"><div class="top"><label for="${id}">${esc(f.label)}</label>${flagTag}</div>${f.help?`<small>${esc(f.help)}</small>`:''}<small class="off-note" hidden></small></div>`;
+  if(f.t==='path')return `<div class="row path${adv}" ${at}>${head}<div class="inp">${ic(f.icon)}<input id="${id}" data-f="${f.id}" class="mono" type="text" spellcheck="false" autocomplete="off" placeholder="${esc(f.ph)}" value="${esc(v[f.id])}"></div></div>`;
+  if(f.t==='toggle')return `<div class="row${adv}" ${at}>${head}<div class="ctl"><span class="switch"><input id="${id}" data-f="${f.id}" type="checkbox" role="switch" ${v[f.id]?'checked':''}><i aria-hidden="true"></i></span></div></div>`;
+  if(f.t==='sel')return `<div class="row in${adv}" ${at}>${head}<select id="${id}" data-f="${f.id}">${f.options.map(o=>`<option value="${o.v}" ${v[f.id]===o.v?'selected':''}>${esc(o.label)}</option>`).join('')}</select></div>`;
+  if(f.t==='chk'){const cur=String(v[f.id]||'');return `<div class="row path${adv}" ${at}>${head}<div class="chks" role="group" aria-label="${esc(f.label)}">${f.options.map(o=>`<label><input type="checkbox" data-f="${f.id}" data-chk="${o.v}" ${cur.includes(o.v)?'checked':''}><span>${esc(o.label)}</span></label>`).join('')}</div></div>`}
+  if(f.t==='area')return `<div class="row path${adv}" ${at}>${head}<textarea id="${id}" data-f="${f.id}" class="mono" spellcheck="false" placeholder="${esc(f.ph||'')}">${esc(v[f.id])}</textarea></div>`;
+  if(f.t==='seg')return `<div class="row modes" role="radiogroup" aria-label="Operation" style="--c:${f.options.length===4?2:f.options.length}" data-row="${f.id}" data-s="${s}">${f.options.map(o=>`<div class="mode"><input type="radio" name="mode" id="f-${f.id}-${o.v}" data-f="${f.id}" value="${o.v}" ${v[f.id]===o.v?'checked':''}><label for="f-${f.id}-${o.v}"><b>${esc(o.label)}</b><span>${esc(o.desc)}</span>${o.tag?`<em class="risk-${o.risk}">${esc(o.tag)}</em>`:''}</label></div>`).join('')}</div>`;
+  return `<div class="row in${adv}" ${at}>${head}<input id="${id}" data-f="${f.id}" class="mono" type="text" spellcheck="false" autocomplete="off" placeholder="${esc(f.ph||'')}" value="${esc(v[f.id])}"></div>`;
+}
+function renderBuilder(key){
+  const m=MODULES[key],v=S[key];
+  const tabId=m.sections.some(s=>s.id===TAB[key])?TAB[key]:m.sections[0].id;
+  $('#view').innerHTML=`
+  <section class="mhead"><span class="tile">${ic(m.icon)}</span>
+    <div class="txt"><h1>${m.name}</h1><p>${esc(m.tagline)}</p></div>
+    <div class="acts"><button class="btn" type="button" data-act="paste">${ic('import')}Paste a command</button><button class="btn" type="button" data-act="save">${ic('bookmark')}Save profile</button></div>
+  </section>
+  <div class="starts"><span>Start from</span>${m.presets.map((p,i)=>`<button class="chip" type="button" data-preset="${i}">${ic(p.icon)}${esc(p.name)}</button>`).join('')}</div>
+  <div class="builder">
+    <div class="forms"><div class="finder"><div class="inp">${ic('search')}<input id="find" type="text" placeholder="${esc(m.find)}" autocomplete="off" spellcheck="false" aria-label="Find an option"></div><label class="fmt"><span class="switch"><input type="checkbox" id="adv" role="switch" ${showAdv?'checked':''}><i aria-hidden="true"></i></span>Show advanced</label><span class="finder-n">${fieldsOf(m).filter(f=>f.t!=='head').length} settings</span></div><div class="prog"><div class="prog-t"><span id="prog-l"></span><small id="prog-r"></small></div><div class="track" id="prog" role="progressbar" aria-label="Setup progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="prog-f"></i></div></div><div class="tabs" role="tablist" aria-label="Option groups">${m.sections.map(s=>`<button type="button" role="tab" id="t-${s.id}" data-tab="${s.id}" aria-selected="${s.id===tabId}" aria-controls="s-${s.id}" tabindex="${s.id===tabId?0:-1}">${esc(s.title)}<b class="tc" data-tc="${s.id}"></b></button>`).join('')}</div>${m.sections.map(s=>`<section class="sec" role="tabpanel" aria-labelledby="t-${s.id}" id="s-${s.id}" ${s.id===tabId?'':'hidden'}><header class="sec-h"><h3>${esc(s.title)}</h3><p>${esc(s.desc)}</p></header>${s.fields.map((f,i)=>fieldHTML(f,v,i)).join('')}</section>`).join('')}<p class="empty" id="find-empty" hidden>No option matches. Try a flag such as /MT or a word such as retry.</p><div class="stepnav"><button class="btn" type="button" id="s-back" data-step="-1">Back</button><button class="btn primary" type="button" id="s-next" data-step="1">Next</button></div></div>
+    <aside class="side" aria-label="Generated command">
+      <div class="term">
+        <div class="term-h">${ic('terminal')}<h2>Command</h2><small id="meta"></small></div>
+        <pre id="cmd" tabindex="0" aria-label="Command text"></pre>
+        <div class="term-f">
+          <button class="btn primary grow" type="button" data-act="copy">${ic('copy')}Copy command</button>
+          <button class="btn sec grow" type="button" data-act="add">${ic('plus')}Add to queue</button>
+          <label class="fmt"><span class="switch"><input type="checkbox" id="multi" role="switch" ${multi?'checked':''}><i aria-hidden="true"></i></span>One option per line</label>
         </div>
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle Dark Mode">
-            <i class="fa-solid fa-moon"></i>
-        </button>
-    </header>
+      </div>
+      <div class="card" id="risk"></div>
+      <div class="card"><h3>What this does</h3><ul class="explain" id="explain"></ul></div>
+    </aside>
+  </div>`;
+  update();applyFilter();tabFade();
+}
+function update(){
+  const key=cur,m=MODULES[key],v=S[key],c=compute(key,multi);
+  $('#cmd').innerHTML=c.html;
+  $('#meta').textContent=`${c.items.length} option${c.items.length===1?'':'s'}, ${c.text.length} characters`;
+  const lv={safe:['safe','shield','No destructive options'],caution:['caution','warn','Review before you run'],danger:['danger','warn','This can delete files']}[c.level];
+  let r=`<div><span class="badge ${lv[0]}">${ic(lv[1])}${lv[2]}</span></div>`;
+  const nn=[...c.notes];if(c.miss.length)nn.unshift({risk:'info',text:`Add ${c.miss.join(' and ')} to finish the command.`});
+  if(nn.length)r+=`<ul class="notes">${nn.map(n=>`<li>${esc(n.text)}</li>`).join('')}</ul>`;
+  else r+=`<p class="empty">Nothing in this command removes or overwrites data.</p>`;
+  if(m.dryId&&c.level!=='safe'&&!v[m.dryId])r+=`<div><button class="btn sm" type="button" data-act="dry">${ic('eye')}Turn on preview only</button></div>`;
+  $('#risk').innerHTML=r;
+  $('#explain').innerHTML=c.items.length?c.items.map(i=>`<li><code>${esc(gstr(i.tok.slice(0,i.tok.length>2?1:undefined)))}</code><span>${esc(i.desc||'')}</span></li>`).join(''):'<li class="empty">Choose an option to see what it does.</li>';
+  m.sections.forEach(s=>{
+    const n=s.fields.filter(f=>!(f.off&&f.off(v))&&isSet(f,v[f.id])).length;
+    const el=$(`[data-tc="${s.id}"]`);if(el)el.textContent=n||'';
+  });
+  fieldsOf(m).forEach(f=>{
+    if(!f.off)return;const row=$(`[data-row="${f.id}"]`);if(!row)return;
+    const why=f.off(v);row.classList.toggle('is-off',!!why);
+    $$('input,select,textarea',row).forEach(x=>x.disabled=!!why);
+    const n=$('.off-note',row);n.hidden=!why;n.textContent=why||'';
+  });
+  $$('[data-act="copy"],[data-act="add"]').forEach(b=>b.setAttribute('aria-disabled',c.miss.length?'true':'false'));
+  paintSteps();persist();
+}
+function loadValues(key,v){S[key]=v;if(page===key)renderBuilder(key)}
+function addToQueue(){
+  const c=compute(cur,false),m=MODULES[cur];
+  if(c.miss.length){toast(`Add ${c.miss[0]} first`,true);return}
+  queue.push({id:uid++,mod:cur,name:m.summary(S[cur]),cmd:c.flat,v:{...S[cur]}});updQ();toast(`Added to queue (${queue.length})`);
+}
+function copyCommand(){const c=compute(cur,multi);if(c.miss.length){toast(`Add ${c.miss[0]} first`,true);return}copyText(c.text,'Command copied')}
+function pasteDialog(){
+  const m=MODULES[cur];
+  openModal('Paste a command',`Paste an existing ${m.bin} command and the form fills in. Flags it does not recognise are kept under Anything else.`,
+    `<textarea id="paste-in" spellcheck="false" placeholder="${m.key==='mirror'?'robocopy &quot;C:\\Data&quot; &quot;D:\\Backup&quot; /MIR /MT:16 /R:2 /W:5':'wget --mirror -k -p -np https://example.org/docs/'}"></textarea>`,
+    [{label:'Cancel'},{label:'Fill the form',primary:true,run:box=>{const t=$('#paste-in',box).value.trim();if(!t)return false;const r=parseCmd(cur,t);loadValues(cur,{...S[cur],...r.v});toast(r.unknown?`Imported, ${r.unknown} flag${r.unknown>1?'s':''} kept as extra`:'Command imported');}}]);
+}
+function saveDialog(){
+  openModal('Save profile','A profile keeps every option so you can load it later.',`<label for="pname" class="lbl"><b>Name</b></label><input id="pname" type="text" placeholder="Weekly photo backup" autocomplete="off">`,
+    [{label:'Cancel'},{label:'Save profile',primary:true,run:box=>{const n=$('#pname',box).value.trim();if(!n)return false;profiles.push({id:'u'+uid++,name:n,mod:cur,v:{...S[cur]},user:true});persistProfiles();toast('Profile saved')}}]);
+}
 
-    <div class="app-container">
-        <nav class="sidebar">
-            <button class="nav-item active" onclick="switchTab('tab-general')">
-                <i class="fa-regular fa-folder-open"></i> General
-            </button>
-            <button class="nav-item" onclick="switchTab('tab-copy')">
-                <i class="fa-solid fa-sliders"></i> Copy Options
-            </button>
-            <button class="nav-item" onclick="switchTab('tab-filters')">
-                <i class="fa-solid fa-filter"></i> File Filters
-            </button>
-             <button class="nav-item" onclick="switchTab('tab-monitoring')">
-                <i class="fa-solid fa-stopwatch"></i> Monitoring
-            </button>
-            <button class="nav-item" onclick="switchTab('tab-logging')">
-                <i class="fa-solid fa-file-lines"></i> Logging
-            </button>
-            <button class="nav-item" onclick="switchTab('tab-queue')">
-                <i class="fa-solid fa-list-check"></i> Queue 
-                <span id="queueBadge" style="margin-left:auto; background:var(--accent-default); color:white; padding:1px 8px; border-radius:12px; font-size:11px; display:none;">0</span>
-            </button>
-        </nav>
+/* ------------------------------------------------------------------ queue */
+function script(kind){
+  const L=[];
+  if(!queue.length)return '';
+  if(kind==='bat'){
+    L.push('@echo off','REM Generated by Conduit','setlocal','');
+    queue.forEach((it,i)=>{L.push(`REM Job ${i+1}: ${it.name}`,it.cmd);if(stopOnFail)L.push(`if errorlevel ${it.mod==='mirror'?8:1} goto :failed`);L.push('')});
+    L.push('echo All jobs finished.','exit /b 0','');
+    if(stopOnFail)L.push(':failed','echo A job failed. Stopping here.','exit /b 1');
+  }else{
+    L.push('# Generated by Conduit',"$ErrorActionPreference = 'Stop'",'');
+    queue.forEach((it,i)=>{L.push(`# Job ${i+1}: ${it.name}`,it.cmd);if(stopOnFail)L.push(`if ($LASTEXITCODE -ge ${it.mod==='mirror'?8:1}) { throw 'Job ${i+1} failed' }`);L.push('')});
+    L.push("Write-Host 'All jobs finished.'");
+  }
+  return L.join('\n').trim();
+}
+function downloadScript(){
+  const sc=script(fmt);if(!sc)return;
+  const text=(fmt==='ps1'?'﻿':'')+sc.replace(/\n/g,'\r\n')+'\r\n';
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));
+  a.download=(APP==='mirror'?'robocopy-jobs':'wget-jobs')+'.'+fmt;
+  document.body.appendChild(a);a.click();a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Script downloaded');
+}
+function renderQueue(){
+  persist();
+  const rows=queue.map((it,i)=>`<div class="item" data-id="${it.id}"><span class="n">${i+1}</span><span class="tile ${MODULES[it.mod].tile}" data-module="${it.mod}" style="background:var(--accent)">${ic(MODULES[it.mod].icon)}</span><div style="min-width:0"><h3>${esc(it.name)}</h3><code>${esc(it.cmd)}</code></div><div class="a">
+    <button class="btn ghost sm icon" type="button" data-q="up" aria-label="Move up" ${i===0?'disabled':''}>${ic('up')}</button>
+    <button class="btn ghost sm icon" type="button" data-q="down" aria-label="Move down" ${i===queue.length-1?'disabled':''}>${ic('down')}</button>
+    <button class="btn ghost sm icon" type="button" data-q="edit" aria-label="Edit in builder">${ic('edit')}</button>
+    <button class="btn ghost sm icon danger-t" type="button" data-q="del" aria-label="Remove">${ic('trash')}</button></div></div>`).join('');
+  const sc=script(fmt);
+  $('#view').innerHTML=`
+  <div class="page-h"><div><h1>Queue</h1><p>Jobs run top to bottom. Export them together as one script.</p></div>
+    <button class="btn" type="button" data-q="clear" ${queue.length?'':'disabled'}>${ic('trash')}Clear all</button></div>
+  <div class="two">
+    <div class="list">${rows||`<div class="blank">${ic('list')}<b>No jobs yet</b><span>Build a command in Mirror or Fetch, then choose Add to queue.</span><a class="btn primary" href="#mirror">Open Mirror</a></div>`}</div>
+    <aside class="side"><div class="term">
+      <div class="term-h">${ic('terminal')}<h2>Script</h2><div class="seg" style="margin-left:auto" role="group" aria-label="Script format"><button type="button" data-fmt="bat" aria-pressed="${fmt==='bat'}">.bat</button><button type="button" data-fmt="ps1" aria-pressed="${fmt==='ps1'}">.ps1</button></div></div>
+      <pre aria-label="Script preview" style="max-height:340px">${sc?esc(sc):'<span class="t-dim">Add a job to see the script.</span>'}</pre>
+      <div class="term-f"><button class="btn primary grow" type="button" data-q="download" ${queue.length?'':'disabled'}>${ic('import')}Download .${fmt}</button><button class="btn sec grow" type="button" data-q="copyscript" ${queue.length?'':'disabled'}>${ic('copy')}Copy script</button>
+      <label class="fmt"><span class="switch"><input type="checkbox" id="stop" role="switch" ${stopOnFail?'checked':''}><i aria-hidden="true"></i></span>Stop on first failure</label></div>
+    </div></aside>
+  </div>`;
+}
 
-        <main class="content-area">
+/* ------------------------------------------------------------------ profiles */
+function renderProfiles(){
+  $('#view').innerHTML=`
+  <div class="page-h"><div><h1>Profiles</h1><p>Saved sets of options for jobs you repeat. Your own profiles stay in this browser.</p></div>
+    <div class="demo"><button class="btn" type="button" data-p="export">${ic('copy')}Copy all as JSON</button><button class="btn" type="button" data-p="import">${ic('import')}Import JSON</button></div></div>
+  <div class="pgrid">${profiles.map(p=>{const m=MODULES[p.mod];const sv=S[p.mod];S[p.mod]=p.v;const c=compute(p.mod,false);S[p.mod]=sv;return `<article class="pcard" data-id="${p.id}" data-module="${p.mod}"><header><span class="tile" style="background:var(--accent)">${ic(m.icon)}</span><div style="min-width:0"><h3>${esc(p.name)}</h3><small>${m.name}${p.user?', yours':', sample'}</small></div></header><code>${esc(c.flat)}</code><footer><button class="btn primary sm" type="button" data-p="load">Open in ${m.name}</button><button class="btn sm" type="button" data-p="queue">${ic('plus')}Queue</button><button class="btn ghost sm icon danger-t" type="button" data-p="del" aria-label="Delete profile">${ic('trash')}</button></footer></article>`}).join('')}</div>`;
+}
 
-            <div id="presets-container" class="fluent-card" style="padding: 16px 20px; display: flex; align-items: center; gap: 20px; border-left: 4px solid var(--accent-default);">
-                <div style="flex:1;">
-                    <div style="font-weight:600; font-size:14px;">Quick Presets</div>
-                    <div style="font-size:12px; color:var(--text-secondary);">Apply common Robocopy configurations instantly.</div>
-                </div>
-                <select id="presetSelect" class="fluent-input fluent-select" onchange="applyPreset()" style="width: 250px;">
-                    <option value="custom">Custom Configuration</option>
-                    <option value="mirror">Mirror (Clone Directory)</option>
-                    <option value="backup">Backup (New/Changed)</option>
-                    <option value="move">Move (Delete Source)</option>
-                    <option value="sync">Sync (Mirror + Security)</option>
-                </select>
-            </div>
+/* ------------------------------------------------------------------ palette */
+let palSel=0,palItems=[];
+function palActions(){
+  const m=MODULES[cur],on=page===cur,A=[];
+  [[`Open ${MODULES[APP].name}`,'#'+APP],['Open Queue','#queue'],['Open Profiles','#profiles']].forEach(a=>A.push({l:a[0],h:'Go',run:()=>{location.hash=a[1]}}));
+  A.push({l:`Open ${OTHER.name} (${OTHER.bin})`,h:'Other app',run:()=>{location.href=OTHER.url}});
+  if(on){
+    m.presets.forEach((p,i)=>A.push({l:`Apply preset: ${p.name}`,h:m.name,run:()=>applyPreset(i)}));
+    A.push({l:'Copy command',h:'Ctrl Enter adds to queue',run:copyCommand},{l:'Add command to queue',h:'Ctrl Enter',run:addToQueue},{l:'Paste a command',h:m.name,run:pasteDialog},{l:'Save as profile',h:m.name,run:saveDialog});
+    fieldsOf(m).filter(f=>f.t!=='path'&&f.t!=='seg'&&f.t!=='head').forEach(f=>A.push({l:`Go to option: ${f.label}`,h:f.flag||'',run:()=>{const fb=$('#find');if(fb)fb.value='';if(f.adv&&!showAdv){showAdv=true;const ad=$('#adv');if(ad)ad.checked=true}setTab(m.sections.find(s=>s.fields.includes(f)).id);const el=$('#f-'+f.id);if(el){el.scrollIntoView({block:'center',behavior:'smooth'});setTimeout(()=>el.focus({preventScroll:true}),250)}}}));
+  }
+  A.push({l:'Switch theme',h:'Appearance',run:toggleTheme});
+  return A;
+}
+function palRender(){
+  const t=$('#pal-in').value.trim().toLowerCase();
+  palItems=palActions().filter(a=>!t||(a.l+' '+a.h).toLowerCase().includes(t));
+  palSel=Math.min(palSel,Math.max(0,palItems.length-1));
+  $('#pal-list').innerHTML=palItems.length?palItems.map((a,i)=>`<li role="option" data-i="${i}" aria-selected="${i===palSel}"><b>${esc(a.l)}</b><small>${esc(a.h)}</small></li>`).join(''):'<li class="empty">Nothing matches. Try a flag such as /MT or a word such as backup.</li>';
+}
+function openPal(){$('#pal').hidden=false;$('#pal-in').value='';palSel=0;palRender();$('#pal-in').focus()}
+function closePal(){$('#pal').hidden=true}
+function runPal(i){const a=palItems[i];if(!a)return;closePal();a.run()}
+$('#pal-in').addEventListener('input',()=>{palSel=0;palRender()});
+$('#pal-list').addEventListener('click',e=>{const li=e.target.closest('[data-i]');if(li)runPal(+li.dataset.i)});
+$('#pal').addEventListener('mousedown',e=>{if(e.target.id==='pal')closePal()});
+$('#pal-in').addEventListener('keydown',e=>{
+  if(e.key==='ArrowDown'){e.preventDefault();palSel=Math.min(palItems.length-1,palSel+1);palRender();$('[aria-selected="true"]',$('#pal-list'))?.scrollIntoView({block:'nearest'})}
+  else if(e.key==='ArrowUp'){e.preventDefault();palSel=Math.max(0,palSel-1);palRender();$('[aria-selected="true"]',$('#pal-list'))?.scrollIntoView({block:'nearest'})}
+  else if(e.key==='Enter'){e.preventDefault();runPal(palSel)}
+});
+$('#open-pal').onclick=openPal;
+function applyPreset(i){const m=MODULES[cur],p=m.presets[i],keep={};fieldsOf(m).filter(f=>f.keep).forEach(f=>keep[f.id]=S[cur][f.id]);loadValues(cur,{...blank(m),...keep,...p.set});toast(`Applied ${p.name}`)}
 
-            <div id="tab-general" class="tab-panel active">
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-location-dot"></i> Source and Destination</div>
-                    <div class="input-group">
-                        <label class="input-label">
-                            Source Directory
-                            <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the path to the source directory."></i>
-                        </label>
-                        <input type="text" id="source" class="fluent-input" placeholder="C:\Source">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">
-                            Destination Directory
-                            <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the path to the destination directory."></i>
-                        </label>
-                        <input type="text" id="destination" class="fluent-input" placeholder="D:\Backup">
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">
-                            File Selection 
-                            <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the file or files to be copied. You can use wildcard characters (* or ?)."></i>
-                            <span class="input-hint">Default: *.*</span>
-                        </label>
-                        <input type="text" id="files" class="fluent-input" placeholder="*.*" value="*.*">
-                    </div>
-                </div>
+/* ------------------------------------------------------------------ theme + router */
+const isDark=()=>{const t=document.documentElement.dataset.theme;return t?t==='dark':matchMedia('(prefers-color-scheme: dark)').matches};
+function paintTheme(){$('#theme-ic').setAttribute('href',isDark()?'#i-sun':'#i-moon')}
+function toggleTheme(){const n=isDark()?'light':'dark';document.documentElement.dataset.theme=n;try{localStorage.setItem('conduit.theme',n)}catch(e){}paintTheme();}
+$('#theme').onclick=toggleTheme;
+try{const t=localStorage.getItem('conduit.theme');if(t)document.documentElement.dataset.theme=t}catch(e){}
+paintTheme();
 
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-bolt"></i> Operation Mode</div>
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            Standard Copy
-                            <span class="toggle-desc">Copies new/changed files. Keeps extras.</span>
-                        </div>
-                        <label class="switch"><input type="radio" name="opMode" value="std" checked onchange="handleModeChange()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            Mirror (/MIR)
-                            <span class="toggle-desc">Mirrors a directory tree (equivalent to /E plus /PURGE). <span class="chip-warning">Deletes Extras</span></span>
-                        </div>
-                        <label class="switch"><input type="radio" name="opMode" value="mir" onchange="handleModeChange()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            Move Files (/MOV)
-                            <span class="toggle-desc">Moves files (deletes from source after copying).</span>
-                        </div>
-                        <label class="switch"><input type="radio" name="opMode" value="mov" onchange="handleModeChange()"><span class="slider"></span></label>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            Move Tree (/MOVE)
-                            <span class="toggle-desc">Moves files and directories (deletes from source after copying).</span>
-                        </div>
-                        <label class="switch"><input type="radio" name="opMode" value="move" onchange="handleModeChange()"><span class="slider"></span></label>
-                    </div>
-                </div>
-            </div>
+const PAGES=[APP,'queue','profiles'];
+const TITLES={[APP]:MODULES[APP].name,queue:'Queue',profiles:'Profiles'};
+function route(){
+  const h=(location.hash||'#'+APP).slice(1);page=PAGES.includes(h)?h:APP;
+  if(MODULES[page])cur=page;
+  $('#app').dataset.module=cur;
+  $$('.nav').forEach(a=>a.toggleAttribute('aria-current',a.dataset.r===page)||a.removeAttribute('aria-current'));
+  $$('.nav').forEach(a=>{if(a.dataset.r===page)a.setAttribute('aria-current','page')});
+  $('#crumb').innerHTML=`<span>Conduit</span><span>/</span><b>${TITLES[page]}</b>`;
+  if(MODULES[page])renderBuilder(page);else if(page==='queue')renderQueue();else renderProfiles();
+  window.scrollTo(0,0);updQ();
+}
+window.addEventListener('hashchange',route);
+window.addEventListener('resize',tabFade);
+$('#view').addEventListener('scroll',e=>{if(e.target.classList&&e.target.classList.contains('tabs'))tabFade()},true);
 
-            <div id="tab-copy" class="tab-panel">
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-copy"></i> Directory & File behavior</div>
-                    <div class="form-grid">
-                        <div class="toggle-row" id="row-e">
-                            <div class="toggle-label">
-                                Recursive (/E)
-                                <span class="toggle-desc">Copies subdirectories, including empty ones.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="e"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Subdirectories (/S)
-                                <span class="toggle-desc">Copies subdirectories, excluding empty ones.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="s"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row" id="row-purge">
-                            <div class="toggle-label">
-                                Purge (/PURGE)
-                                <span class="toggle-desc">Deletes destination files/directories that no longer exist in source.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="purge"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Restartable (/Z)
-                                <span class="toggle-desc">Copies files in restartable mode (resumes if network fails).</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="z"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Backup Mode (/B)
-                                <span class="toggle-desc">Copies files in backup mode (bypasses file permission restrictions).</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="b"><span class="slider"></span></label>
-                        </div>
-                         <div class="toggle-row">
-                            <div class="toggle-label">
-                                Encrypted Raw (/EFSRAW)
-                                <span class="toggle-desc">Copies all encrypted files in EFS RAW mode.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="efsraw"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-shield-halved"></i> Attributes & Security</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Copy Flags (/COPY:)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the file properties to be copied. Defaults to Data, Attributes, and Timestamps."></i>
-                                <span class="input-hint">Default: DAT</span>
-                            </label>
-                            <select id="copy" class="fluent-input fluent-select">
-                                <option value="">Default (Data, Attr, Time)</option>
-                                <option value="D">D - Data</option>
-                                <option value="DA">DA - Data, Attributes</option>
-                                <option value="DAT">DAT - Data, Attr, Time</option>
-                                <option value="DATS">DATS - + Security (ACLs)</option>
-                                <option value="DATSO">DATSO - + Owner Info</option>
-                                <option value="DATSOU">DATSOU - All Info</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Directory Flags (/DCOPY:)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies what to copy for directories. Defaults to Data and Attributes."></i>
-                                <span class="input-hint">Default: DA</span>
-                            </label>
-                            <select id="dcopy" class="fluent-input fluent-select">
-                                <option value="">Default (Data, Attr)</option>
-                                <option value="D">D - Data</option>
-                                <option value="DA">DA - Data, Attributes</option>
-                                <option value="DAT">DAT - + Timestamps</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="form-grid" style="margin-top:10px;">
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Copy All (/COPYALL)
-                                <span class="toggle-desc">Copies all file information (equivalent to /COPY:DATSOU).</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="copyall"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Copy Security (/SEC)
-                                <span class="toggle-desc">Copies files with security (equivalent to /COPY:DATS).</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="sec"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Fix Security (/SECFIX)
-                                <span class="toggle-desc">Fixes file security on all files, even skipped ones.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="secfix"><span class="slider"></span></label>
-                        </div>
-                    </div>
-
-                    <div class="form-grid" style="margin-top: 20px;">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Add Attributes (/A+)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Adds the given attributes to copied files. (R=Read only, A=Archive, S=System, H=Hidden)"></i>
-                            </label>
-                            <input type="text" id="aplus" class="fluent-input" placeholder="RASHCNET">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Remove Attributes (/A-)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Removes the given attributes from copied files."></i>
-                            </label>
-                            <input type="text" id="aminus" class="fluent-input" placeholder="RASHCNET">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-filters" class="tab-panel">
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-filter"></i> Exclusion Rules</div>
-                    <div class="form-grid">
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Exclude Older (/XO)
-                                <span class="toggle-desc">Excludes older files. Does not overwrite destination if it's newer.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="xo"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Exclude Newer (/XN)
-                                <span class="toggle-desc">Excludes newer files.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="xn"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Exclude Changed (/XC)
-                                <span class="toggle-desc">Excludes changed files.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="xc"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">
-                                Exclude Junctions (/XJ)
-                                <span class="toggle-desc">Excludes Junction points (soft links) for directories.</span>
-                            </div>
-                            <label class="switch"><input type="checkbox" id="xj"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                    <div class="form-grid" style="margin-top:16px;">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Exclude Files (/XF)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes files that match the specified names or wildcards."></i>
-                            </label>
-                            <input type="text" id="xf" class="fluent-input" placeholder="*.tmp *.log">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Exclude Dirs (/XD)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes directories that match the specified names or paths."></i>
-                            </label>
-                            <input type="text" id="xd" class="fluent-input" placeholder="$RECYCLE.BIN Temp">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-ruler-combined"></i> Size and Age</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Max Size (/MAX)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes files larger than n bytes."></i>
-                                <span class="input-hint">Bytes</span>
-                            </label>
-                            <input type="number" id="max" class="fluent-input">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Min Size (/MIN)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes files smaller than n bytes."></i>
-                                <span class="input-hint">Bytes</span>
-                            </label>
-                            <input type="number" id="min" class="fluent-input">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Max Age (/MAXAGE)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes files older than n days or specified date."></i>
-                                <span class="input-hint">Days or YYYYMMDD</span>
-                            </label>
-                            <input type="text" id="maxage" class="fluent-input">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Min Age (/MINAGE)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Excludes files newer than n days or specified date."></i>
-                                <span class="input-hint">Days or YYYYMMDD</span>
-                            </label>
-                            <input type="text" id="minage" class="fluent-input">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-monitoring" class="tab-panel">
-                 <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-gauge-high"></i> Performance & Retry</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Multi-Threading (/MT)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Creates multi-threaded copies with n threads."></i>
-                                <span class="input-hint">1-128 (Default 8)</span>
-                            </label>
-                            <input type="number" id="mt" class="fluent-input" placeholder="8">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Inter-Packet Gap (/IPG)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the inter-packet gap to free up bandwidth on slow lines."></i>
-                                <span class="input-hint">ms (Slow down)</span>
-                            </label>
-                            <input type="number" id="ipg" class="fluent-input" placeholder="0">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Retry Count (/R)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the number of retries on failed copies."></i>
-                                <span class="input-hint">Default 1 million</span>
-                            </label>
-                            <input type="number" id="r" class="fluent-input" placeholder="1000000">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Wait Time (/W)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies the wait time between retries in seconds."></i>
-                                <span class="input-hint">Seconds</span>
-                            </label>
-                            <input type="number" id="w" class="fluent-input" placeholder="30">
-                        </div>
-                    </div>
-                </div>
-
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-binoculars"></i> Live Monitoring</div>
-                    <div class="form-grid">
-                        <div class="input-group">
-                            <label class="input-label">
-                                Run on Changes (/MON)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Monitors source; runs again when more than n changes are seen."></i>
-                                <span class="input-hint">Min changes</span>
-                            </label>
-                            <input type="number" id="mon" class="fluent-input" placeholder="0">
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label">
-                                Check Interval (/MOT)
-                                <i class="fa-regular fa-circle-question help-icon" data-tip="Monitors source; runs again in m minutes if changes are detected."></i>
-                                <span class="input-hint">Minutes</span>
-                            </label>
-                            <input type="number" id="mot" class="fluent-input" placeholder="0">
-                        </div>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label">
-                            Run Hours (/RH)
-                            <i class="fa-regular fa-circle-question help-icon" data-tip="Specifies run hours when new copies may be started."></i>
-                            <span class="input-hint">HHMM-HHMM (e.g. 2200-0600)</span>
-                        </label>
-                        <input type="text" id="rh" class="fluent-input">
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-logging" class="tab-panel">
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-list-ol"></i> Log Files</div>
-                    <div class="toggle-row" style="background:var(--warning-bg); border-radius:var(--radius-md); padding:8px 12px; margin-bottom:16px;">
-                        <div class="toggle-label" style="color:var(--warning-text)">
-                            <strong>Dry Run (/L)</strong>
-                            <span class="toggle-desc" style="color:var(--warning-text)">List only. No files will be copied or deleted.</span>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="l"><span class="slider"></span></label>
-                    </div>
-
-                    <div class="input-group">
-                        <label class="input-label">
-                            Log Path (/LOG)
-                            <i class="fa-regular fa-circle-question help-icon" data-tip="Output status to LOG file (overwrites existing)."></i>
-                        </label>
-                        <div style="display:flex; gap:12px;">
-                            <input type="text" id="log" class="fluent-input" placeholder="C:\Logs\robo.log">
-                            <div class="toggle-row" style="padding:0; min-height:0; border:none;">
-                                <label class="switch" title="Append to log"><input type="checkbox" id="logplus"><span class="slider"></span></label>
-                                <span style="font-size:12px; margin-left:8px;">Append</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="toggle-row">
-                        <div class="toggle-label">
-                            Console & Log (/TEE)
-                            <span class="toggle-desc">Outputs to console window, as well as the log file.</span>
-                        </div>
-                        <label class="switch"><input type="checkbox" id="tee"><span class="slider"></span></label>
-                    </div>
-                </div>
-
-                <div class="fluent-card">
-                    <div class="card-header"><i class="fa-solid fa-eye-slash"></i> Output Noise</div>
-                    <div class="form-grid">
-                        <div class="toggle-row">
-                            <div class="toggle-label">Verbose (/V)<span class="toggle-desc">Shows skipped files.</span></div>
-                            <label class="switch"><input type="checkbox" id="v"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">No Progress (/NP)<span class="toggle-desc">Don't display % progress.</span></div>
-                            <label class="switch"><input type="checkbox" id="np"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">No File List (/NFL)<span class="toggle-desc">Don't log file names.</span></div>
-                            <label class="switch"><input type="checkbox" id="nfl"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">No Dir List (/NDL)<span class="toggle-desc">Don't log directory names.</span></div>
-                            <label class="switch"><input type="checkbox" id="ndl"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">Show Timestamps (/TS)<span class="toggle-desc">Include source file timestamps.</span></div>
-                            <label class="switch"><input type="checkbox" id="ts"><span class="slider"></span></label>
-                        </div>
-                        <div class="toggle-row">
-                            <div class="toggle-label">Show Full Path (/FP)<span class="toggle-desc">Include full pathnames of files.</span></div>
-                            <label class="switch"><input type="checkbox" id="fp"><span class="slider"></span></label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-queue" class="tab-panel">
-                <div class="fluent-card">
-                    <div class="card-header">
-                        <span><i class="fa-solid fa-layer-group"></i> Batch Queue</span>
-                        <div class="btn-group" style="margin-left:auto;">
-                            <button class="btn btn-secondary" onclick="clearQueue()">Clear</button>
-                            <button class="btn btn-primary" onclick="downloadBatch()">Download .BAT</button>
-                        </div>
-                    </div>
-                    <div id="queueList" style="min-height: 200px; background: var(--bg-app); border: 1px solid var(--border-input); border-radius: var(--radius-md); padding: 16px;">
-                        <p style="text-align:center; color:var(--text-secondary); margin-top: 80px;">Queue is empty</p>
-                    </div>
-                </div>
-            </div>
-
-            <div style="height: 120px;"></div> </main>
-    </div>
-
-    <footer class="command-bar">
-        <div class="cmd-preview" id="commandOutput"></div>
-        <div class="action-row">
-            <span style="font-size: 12px; color: var(--text-secondary);">
-                <i class="fa-solid fa-circle-info"></i> Adjust settings above to update command.
-            </span>
-            <div class="btn-group">
-                <button class="btn btn-danger" onclick="resetForm()">
-                    <i class="fa-solid fa-trash"></i> Reset
-                </button>
-                <button class="btn btn-secondary" onclick="addToQueue()">
-                    <i class="fa-solid fa-plus"></i> Add Queue
-                </button>
-                <button class="btn btn-primary" onclick="copyToClipboard()">
-                    <i class="fa-regular fa-clipboard"></i> Copy
-                </button>
-            </div>
-        </div>
-    </footer>
-
-    <div id="toast" class="toast">
-        <i class="fa-solid fa-check-circle"></i>
-        <span id="toastMsg">Action Successful</span>
-    </div>
-
-    <script>
-        // State
-        let commandQueue = [];
-
-        // Initialization
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputs = document.querySelectorAll('input, select');
-            inputs.forEach(input => {
-                input.addEventListener('input', updateCommand);
-                input.addEventListener('change', updateCommand);
-            });
-            
-            // Set Dark Mode if system prefers
-            if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
-                document.body.setAttribute('data-theme', 'dark');
-            }
-            
-            // Initialize mode and command
-            handleModeChange();
-            updateCommand();
-        });
-
-        // Theme Toggle
-        function toggleTheme() {
-            const current = document.body.getAttribute('data-theme');
-            document.body.setAttribute('data-theme', current === 'dark' ? 'light' : 'dark');
-        }
-
-        // Tab Switching
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            
-            document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
-
-            // Hide Presets on Queue tab
-            const presets = document.getElementById('presets-container');
-            if(tabId === 'tab-queue') presets.style.display = 'none';
-            else presets.style.display = 'flex';
-        }
-
-        // --- Logic: Mode Handling ---
-        function handleModeChange() {
-            const mode = document.querySelector('input[name="opMode"]:checked').value;
-            
-            // Elements
-            const eSwitch = document.getElementById('e');
-            const purgeSwitch = document.getElementById('purge');
-            const rowE = document.getElementById('row-e');
-            const rowPurge = document.getElementById('row-purge');
-
-            // Reset Locks
-            eSwitch.disabled = false;
-            purgeSwitch.disabled = false;
-            rowE.classList.remove('disabled');
-            rowPurge.classList.remove('disabled');
-
-            // Apply Locks based on Mode
-            if (mode === 'mir') {
-                eSwitch.checked = true;
-                eSwitch.disabled = true;
-                rowE.classList.add('disabled');
-                
-                purgeSwitch.checked = true;
-                purgeSwitch.disabled = true;
-                rowPurge.classList.add('disabled');
-            } else if (mode === 'move') {
-                eSwitch.checked = true; // MOVE usually implies recursive
-            }
-
-            updateCommand();
-        }
-
-        // --- Logic: Presets ---
-        function applyPreset() {
-            const preset = document.getElementById('presetSelect').value;
-            if (preset === 'custom') return;
-
-            // Reset Checkboxes
-            document.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
-            // Default Values
-            document.getElementById('mt').value = '8';
-            document.getElementById('r').value = '1000000';
-            document.getElementById('w').value = '30';
-
-            // Select Radio Helper
-            const setMode = (val) => {
-                const radio = document.querySelector(`input[name="opMode"][value="${val}"]`);
-                if(radio) { radio.checked = true; handleModeChange(); }
-            };
-
-            switch(preset) {
-                case 'mirror':
-                    setMode('mir');
-                    break;
-                case 'backup':
-                    setMode('std');
-                    document.getElementById('e').checked = true;
-                    document.getElementById('xo').checked = true; // Exclude older
-                    break;
-                case 'move':
-                    setMode('move');
-                    break;
-                case 'sync':
-                    setMode('mir');
-                    document.getElementById('sec').checked = true;
-                    break;
-            }
-
-            updateCommand();
-            showToast(`Applied preset: ${preset}`);
-        }
-
-        // --- Logic: Generate Command ---
-        function updateCommand() {
-            const source = document.getElementById('source').value.trim() || 'Source';
-            const dest = document.getElementById('destination').value.trim() || 'Destination';
-            const files = document.getElementById('files').value.trim() || '*.*';
-            
-            let cmd = `robocopy "${source}" "${dest}" ${files}`;
-
-            // Helpers
-            const isC = (id) => document.getElementById(id).checked;
-            const val = (id) => document.getElementById(id).value.trim();
-
-            // 1. Mode
-            const mode = document.querySelector('input[name="opMode"]:checked').value;
-            if (mode === 'mir') cmd += ' /MIR';
-            else if (mode === 'move') cmd += ' /MOVE';
-            else if (mode === 'mov') cmd += ' /MOV';
-
-            // 2. Structure
-            // If MIR is on, E and PURGE are implied, but we can add them for clarity or rely on robocopy defaults.
-            // Since we disabled the inputs visually, we check the checked state.
-            if (isC('e') && mode !== 'mir') cmd += ' /E';
-            if (isC('s')) cmd += ' /S';
-            if (isC('purge') && mode !== 'mir') cmd += ' /PURGE';
-            if (isC('z')) cmd += ' /Z';
-            if (isC('b')) cmd += ' /B';
-            if (isC('efsraw')) cmd += ' /EFSRAW';
-
-            // 3. Security / Attrs
-            if (isC('copyall')) cmd += ' /COPYALL';
-            else {
-                const copy = val('copy'); if(copy) cmd += ` /COPY:${copy}`;
-                const dcopy = val('dcopy'); if(dcopy) cmd += ` /DCOPY:${dcopy}`;
-                if (isC('sec')) cmd += ' /SEC';
-            }
-            if (isC('secfix')) cmd += ' /SECFIX';
-            const ap = val('aplus'); if(ap) cmd += ` /A+:${ap}`;
-            const am = val('aminus'); if(am) cmd += ` /A-:${am}`;
-
-            // 4. Filters
-            if(isC('xo')) cmd += ' /XO';
-            if(isC('xn')) cmd += ' /XN';
-            if(isC('xc')) cmd += ' /XC';
-            if(isC('xj')) cmd += ' /XJ';
-            
-            const xf = val('xf'); if(xf) cmd += ` /XF ${xf}`;
-            const xd = val('xd'); if(xd) cmd += ` /XD ${xd}`;
-            const max = val('max'); if(max) cmd += ` /MAX:${max}`;
-            const min = val('min'); if(min) cmd += ` /MIN:${min}`;
-            const maxage = val('maxage'); if(maxage) cmd += ` /MAXAGE:${maxage}`;
-            const minage = val('minage'); if(minage) cmd += ` /MINAGE:${minage}`;
-
-            // 5. Perf / Monitor
-            const mt = val('mt'); if(mt) cmd += ` /MT:${mt}`;
-            const ipg = val('ipg'); if(ipg) cmd += ` /IPG:${ipg}`;
-            const r = val('r'); if(r) cmd += ` /R:${r}`;
-            const w = val('w'); if(w) cmd += ` /W:${w}`;
-            
-            const mon = val('mon'); if(mon) cmd += ` /MON:${mon}`;
-            const mot = val('mot'); if(mot) cmd += ` /MOT:${mot}`;
-            const rh = val('rh'); if(rh) cmd += ` /RH:${rh}`;
-
-            // 6. Logging
-            if (isC('l')) cmd += ' /L';
-            const logPath = val('log');
-            if (logPath) {
-                const append = isC('logplus') ? '+' : '';
-                cmd += ` /LOG${append}:"${logPath}"`;
-            }
-            if(isC('tee')) cmd += ' /TEE';
-            if(isC('v')) cmd += ' /V';
-            if(isC('np')) cmd += ' /NP';
-            if(isC('nfl')) cmd += ' /NFL';
-            if(isC('ndl')) cmd += ' /NDL';
-            if(isC('ts')) cmd += ' /TS';
-            if(isC('fp')) cmd += ' /FP';
-
-            // Output
-            const out = document.getElementById('commandOutput');
-            out.textContent = cmd;
-
-            // Visual for Dry Run
-            if(isC('l')) {
-                out.style.border = '1px solid var(--warning-text)';
-                out.style.backgroundColor = 'var(--warning-bg)';
-                out.style.color = 'var(--warning-text)';
-            } else {
-                out.style.border = '';
-                out.style.backgroundColor = '';
-                out.style.color = '';
-            }
-        }
-
-        // --- Utils ---
-        function copyToClipboard() {
-            const text = document.getElementById('commandOutput').textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                showToast("Command copied to clipboard");
-            });
-        }
-
-        function resetForm() {
-            document.querySelectorAll('input').forEach(i => {
-                if(i.type === 'checkbox') i.checked = false;
-                else if(i.type === 'radio' && i.value === 'std') i.checked = true;
-                else if(i.id !== 'files') i.value = '';
-            });
-            document.getElementById('files').value = '*.*';
-            document.getElementById('presetSelect').value = 'custom';
-            
-            handleModeChange();
-            updateCommand();
-            showToast("Form reset");
-        }
-
-        function addToQueue() {
-            const cmd = document.getElementById('commandOutput').textContent;
-            commandQueue.push(cmd);
-            updateQueueUI();
-            showToast("Added to Batch Queue");
-        }
-
-        function clearQueue() {
-            commandQueue = [];
-            updateQueueUI();
-            showToast("Queue cleared");
-        }
-
-        function updateQueueUI() {
-            const list = document.getElementById('queueList');
-            const badge = document.getElementById('queueBadge');
-
-            if (commandQueue.length === 0) {
-                list.innerHTML = '<p style="text-align:center; color:var(--text-secondary); margin-top: 80px;">Queue is empty</p>';
-                badge.style.display = 'none';
-                return;
-            }
-            
-            badge.innerText = commandQueue.length;
-            badge.style.display = 'inline-block';
-
-            list.innerHTML = commandQueue.map((cmd, i) => `
-                <div style="background:var(--bg-card); border-bottom:1px solid var(--border-base); padding:10px; font-family:'Consolas', monospace; font-size:12px; margin-bottom: 8px;">
-                    <div style="color:var(--accent-default); font-weight:bold; margin-bottom:4px;">Job ${i+1}</div>
-                    <div style="word-break:break-all;">${cmd}</div>
-                </div>
-            `).join('');
-        }
-
-        function downloadBatch() {
-            if (commandQueue.length === 0) return showToast("Queue is empty!");
-            
-            let content = "@echo off\r\nREM Generated by RoboGUI\r\n\r\n";
-            commandQueue.forEach(cmd => {
-                content += `echo Executing: ${cmd}\r\n`;
-                content += `${cmd}\r\n`;
-                content += `if %errorlevel% gtr 8 echo FAILED & pause\r\n\r\n`;
-            });
-            content += "echo All jobs finished.\r\npause";
-
-            const blob = new Blob([content], {type: "text/plain"});
-            const a = document.createElement('a');
-            a.href = URL.createObjectURL(blob);
-            a.download = "robocopy_script.bat";
-            a.click();
-        }
-
-        function showToast(msg) {
-            const t = document.getElementById('toast');
-            document.getElementById('toastMsg').innerText = msg;
-            t.classList.add('show');
-            setTimeout(() => t.classList.remove('show'), 3000);
-        }
-
-    </script>
+/* ------------------------------------------------------------------ events */
+const view=$('#view');
+function onField(e){
+  const el=e.target.closest('[data-f]');if(!el||!MODULES[page])return;
+  const f=fieldsOf(MODULES[page]).find(x=>x.id===el.dataset.f);if(!f)return;
+  if(el.dataset.chk!==undefined)S[page][f.id]=$$('input:checked',el.closest('.chks')).map(x=>x.dataset.chk).join('');
+  else S[page][f.id]=el.type==='checkbox'?el.checked:el.value;
+  update();
+}
+view.addEventListener('input',e=>{if(e.target.id==='find'){applyFilter();return}onField(e)});
+view.addEventListener('change',e=>{
+  if(e.target.id==='find')return;
+  if(e.target.id==='adv'){showAdv=e.target.checked;applyFilter();update();return}
+  if(e.target.id==='multi'){multi=e.target.checked;update();return}
+  if(e.target.id==='stop'){stopOnFail=e.target.checked;renderQueue();return}
+  onField(e);
+});
+view.addEventListener('keydown',e=>{
+  const t=e.target.closest('[role="tab"]');if(!t||!MODULES[page])return;
+  const ids=MODULES[page].sections.map(s=>s.id),i=ids.indexOf(t.dataset.tab);
+  let n=-1;
+  if(e.key==='ArrowRight')n=(i+1)%ids.length;else if(e.key==='ArrowLeft')n=(i-1+ids.length)%ids.length;else if(e.key==='Home')n=0;else if(e.key==='End')n=ids.length-1;
+  if(n>=0){e.preventDefault();setTab(ids[n],true)}
+});
+view.addEventListener('click',e=>{
+  const b=e.target.closest('button,a');if(!b)return;
+  if(b.dataset.tab){setTab(b.dataset.tab);return}
+  if(b.dataset.step){
+    const ids=MODULES[page].sections.map(s=>s.id),i=ids.indexOf(ids.includes(TAB[page])?TAB[page]:ids[0]),n=i+(+b.dataset.step);
+    if(ids[n]){setTab(ids[n]);$('.tabs').scrollIntoView({block:'nearest'})}
+    return;
+  }
+  const act=b.dataset.act;
+  if(act==='copy')copyCommand();
+  else if(act==='add')addToQueue();
+  else if(act==='paste')pasteDialog();
+  else if(act==='save')saveDialog();
+  else if(act==='dry'){S[cur][MODULES[cur].dryId]=true;renderBuilder(cur);toast('Preview only is on')}
+  if(b.dataset.preset!==undefined)applyPreset(+b.dataset.preset);
+  if(b.dataset.fmt){fmt=b.dataset.fmt;renderQueue()}
+  const qa=b.dataset.q;
+  if(qa){
+    const row=b.closest('.item'),i=row?queue.findIndex(x=>x.id===+row.dataset.id):-1;
+    if(qa==='up'&&i>0){[queue[i-1],queue[i]]=[queue[i],queue[i-1]];renderQueue()}
+    else if(qa==='down'&&i>=0&&i<queue.length-1){[queue[i+1],queue[i]]=[queue[i],queue[i+1]];renderQueue()}
+    else if(qa==='del'&&i>=0){queue.splice(i,1);updQ();renderQueue()}
+    else if(qa==='edit'&&i>=0){S[queue[i].mod]={...queue[i].v};location.hash='#'+queue[i].mod;toast('Loaded into the builder')}
+    else if(qa==='clear'){queue=[];updQ();renderQueue()}
+    else if(qa==='download')downloadScript();
+    else if(qa==='copyscript')copyText(script(fmt),'Script copied');
+  }
+  const pa=b.dataset.p;
+  if(pa){
+    const card=b.closest('.pcard'),p=card&&profiles.find(x=>x.id===card.dataset.id);
+    if(pa==='load'&&p){S[p.mod]={...p.v};location.hash='#'+p.mod}
+    else if(pa==='queue'&&p){const sv=S[p.mod];S[p.mod]=p.v;const c=compute(p.mod,false);S[p.mod]=sv;queue.push({id:uid++,mod:p.mod,name:MODULES[p.mod].summary(p.v),cmd:c.flat,v:{...p.v}});updQ();toast('Added to queue')}
+    else if(pa==='del'&&p){profiles=profiles.filter(x=>x!==p);persistProfiles();renderProfiles()}
+    else if(pa==='export')copyText(JSON.stringify(profiles.map(({name,mod,v})=>({name,mod,v})),null,2),'Profiles copied as JSON');
+    else if(pa==='import')openModal('Import profiles','Paste JSON copied from Conduit.','<textarea id="imp" spellcheck="false" placeholder="[ { &quot;name&quot;: &quot;...&quot;, &quot;mod&quot;: &quot;mirror&quot;, &quot;v&quot;: { } } ]"></textarea>',[{label:'Cancel'},{label:'Import',primary:true,run:box=>{try{const a=JSON.parse($('#imp',box).value);if(!Array.isArray(a))throw 0;a.forEach(x=>{if(x&&MODULES[x.mod]&&x.v)profiles.push({id:'u'+uid++,name:String(x.name||'Imported'),mod:x.mod,v:{...blank(MODULES[x.mod]),...x.v},user:true})});persistProfiles();renderProfiles();toast('Profiles imported')}catch(err){toast('That is not valid profile JSON',true);return false}}}]);
+  }
+});
+document.addEventListener('keydown',e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='k'){e.preventDefault();$('#pal').hidden?openPal():closePal();return}
+  if(e.key==='Escape'){if(!$('#pal').hidden)closePal();else if(!$('#modal').hidden)closeModal();return}
+  if((e.ctrlKey||e.metaKey)&&e.key==='Enter'&&MODULES[page]){e.preventDefault();addToQueue()}
+});
+route();
+})();
+</script>
 </body>
 </html>
